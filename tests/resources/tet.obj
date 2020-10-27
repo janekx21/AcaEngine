@@ -1,0 +1,51 @@
+# vertices only support 3d
+v 0 0 0
+v 1 0 0
+v 0 1 0
+v 0 0 1
+
+# texture only support 2d
+vt 0. 0.
+vt 1. 0.
+vt 0. 1.
+vt 1. 1.
+
+# normals only support 3d
+vn 1. 0. 0.
+vn 0. 1. 0.
+vn 0. 0. -1.
+vn 1. 1. 1.
+
+
+# faces vertex/texture/normal
+# tet_complete
+f 1/1/1 4/4/1 2/2/1
+f 1/1/2 3/3/2 4/4/2
+f 1/1/3 2/2/3 3/3/3
+f 4/4/4 2/2/4 3/3/4
+
+# faces vertex//normal
+# tet_normal
+f 1//1 4//1 2//1
+f 1//2 3//2 4//2
+f 1//3 2//3 3//3
+f 4//4 2//4 3//4
+
+# faces vertex/texture
+# tet_texture
+f 1/1 4/4 2/2
+f 1/1 3/3 4/4
+f 1/1 2/2 3/3
+f 4/4 2/2 3/3
+
+# faces vertex
+# tet
+f 1 4 2
+f 1 3 4
+f 1 2 3
+f 4 2 3
+
+# skipped syntax
+s 0
+mtllib tet.mtl
+usemtl Material
