@@ -1,42 +1,49 @@
-#include <string>
-
+#include <engine/graphics/renderer/mesh.hpp>
+#include <engine/graphics/renderer/meshrenderer.hpp>
+#include <engine/utils/meshloader.hpp>
+#include <engine/graphics/core/device.hpp>
+#include <engine/input/inputmanager.hpp>
+#include <engine/utils/meshloader.hpp>
+#include <gl/GL.h>
 #include <GLFW/glfw3.h>
-#include <spdlog/spdlog.h>
 
-void ErrorCallback(int, const char* err_str)
-{
-	spdlog::error("GLFW Error: {}", err_str);
-}
+#include <thread>
+
+// CRT's memory leak detection
+#ifndef NDEBUG 
+#if defined(_MSC_VER)
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#endif
+#endif
+
+using namespace std::chrono_literals;
 
 int main(int argc, char *argv[])
 {
-	if (!glfwInit())
-	{
-		const char* msg;
-		int err = glfwGetError(&msg);
-		spdlog::error("Could not initialize glew. Error: " + std::to_string(err) + msg);
-		return EXIT_FAILURE;
-	}
-	glfwSetErrorCallback(ErrorCallback);
+#ifndef NDEBUG 
+#if defined(_MSC_VER)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//	_CrtSetBreakAlloc(2760);
+#endif
+#endif
 
-	/* config */
-	GLFWwindow* window = glfwCreateWindow(1366, 768, "hello world!",
-										  nullptr, nullptr);
-	if (!window)
-	{
-		spdlog::error("Could not create window.");
-		glfwTerminate();
-		return EXIT_FAILURE;
-	}
-	glfwMakeContextCurrent(window);
+	graphics::Device::initialize(1366, 768,false);
+	GLFWwindow* window = graphics::Device::getWindow();
+	input::InputManager::initialize(window);
+
+	glClearColor(0.f, 1.f, 0.f, 1.f);
 
 	while (!glfwWindowShouldClose(window))
 	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		glfwPollEvents();
 		glfwSwapBuffers(window);
+		std::this_thread::sleep_for(16ms);
 	}
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	utils::MeshLoader::clear();
+	graphics::Device::close();
 	return EXIT_SUCCESS;
 }
