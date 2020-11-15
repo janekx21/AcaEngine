@@ -2,41 +2,46 @@
 
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
+#include <iostream>
+#include "engine/graphics/core/device.hpp"
+#include "engine/graphics/core/shader.hpp"
+#include "engine/graphics/core/geometrybuffer.hpp"
 
-void ErrorCallback(int, const char* err_str)
-{
-	spdlog::error("GLFW Error: {}", err_str);
-}
+int main(int argc, char *argv[]) {
+  graphics::Device::initialize(1366, 768, false);
+  GLFWwindow *window = graphics::Device::getWindow();
 
-int main(int argc, char *argv[])
-{
-	if (!glfwInit())
-	{
-		const char* msg;
-		int err = glfwGetError(&msg);
-		spdlog::error("Could not initialize glew. Error: " + std::to_string(err) + msg);
-		return EXIT_FAILURE;
-	}
-	glfwSetErrorCallback(ErrorCallback);
+  graphics::VertexAttribute attributes[] = {
+          {graphics::PrimitiveFormat::FLOAT, 3, false, false},
+          {graphics::PrimitiveFormat::FLOAT, 3, false, false}
+          };
+  auto geo = graphics::GeometryBuffer(graphics::GLPrimitiveType::TRIANGLES, attributes, 2, 0, 4 * 3 * 2 * 3);
+  auto vertexShader = graphics::Shader::load("../resources/shader/simple_pass.vert", graphics::ShaderType::VERTEX,
+                                             nullptr);
+  auto fragmentShader = graphics::Shader::load("../resources/shader/simple_pass.frag", graphics::ShaderType::FRAGMENT,
+                                               nullptr);
+  auto program = graphics::Program();
+  program.attach(vertexShader);
+  program.attach(fragmentShader);
+  program.link();
+  program.use();
 
-	/* config */
-	GLFWwindow* window = glfwCreateWindow(1366, 768, "hello world!",
-										  nullptr, nullptr);
-	if (!window)
-	{
-		spdlog::error("Could not create window.");
-		glfwTerminate();
-		return EXIT_FAILURE;
-	}
-	glfwMakeContextCurrent(window);
+  float data[] = {-1, -1, 0, 1, 0, 0,
+                  1, -1, 0, 0, 1, 0,
+                  0, 1, 0, 0, 0, 1};
+  geo.bind();
+  geo.setData(data, 4 * 3 * 2 * 3);
+  glClearColor(.25, .2, .2, 1);
 
-	while (!glfwWindowShouldClose(window))
-	{
-		glfwPollEvents();
-		glfwSwapBuffers(window);
-	}
+  while (!glfwWindowShouldClose(window)) {
+    glfwPollEvents();
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
-	return EXIT_SUCCESS;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    geo.draw();
+
+    glfwSwapBuffers(window);
+  }
+
+  graphics::Device::close();
+  return EXIT_SUCCESS;
 }
