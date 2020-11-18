@@ -4,48 +4,51 @@
 #include "engine/utils/meshloader.hpp"
 
 namespace graphics {
-  std::vector<float> generatePositionData(const utils::MeshData *meshData);
-
-  std::vector<int> generateIndexData(const utils::MeshData *meshData);
+  const int VERTEX_PER_POLYGON = 3;
+  const int POSITION_DIMENSIONS = 3;
+  const int TEXTURE_COORD_DIMENSIONS = 2;
 
   const std::vector<VertexAttribute> Mesh::attributes = {
-          {graphics::PrimitiveFormat::FLOAT, 3, false, false},
+          {graphics::PrimitiveFormat::FLOAT, POSITION_DIMENSIONS,      false, false},
+          {graphics::PrimitiveFormat::FLOAT, POSITION_DIMENSIONS,      false, false},
+          {graphics::PrimitiveFormat::FLOAT, TEXTURE_COORD_DIMENSIONS, false, false},
   };
-  const int VERTEX_PER_POLYGON = 3;
 
   Mesh::Mesh(const std::string &path) : geometryBuffer(
-          GeometryBuffer(graphics::GLPrimitiveType::TRIANGLES, attributes.data(), attributes.size(), 1)) {
+          GeometryBuffer(graphics::GLPrimitiveType::TRIANGLES, attributes.data(), attributes.size(), false)) {
     auto meshData = utils::MeshLoader::get(path.c_str());
+    auto floatCount = 0;
+    for(auto& attribute : Mesh::attributes) {
+      floatCount += attribute.numComponents;
+    }
+    std::vector<float> bufferData(0);
+    // meshData->faces.size() * floatCount * VERTEX_PER_POLYGON
 
-    auto positionData = generatePositionData(meshData);
-    geometryBuffer.setData(positionData.data(), positionData.size() * sizeof(float));
+    for(auto& face : meshData->faces) {
+      for(auto& vertex : face.indices) {
+        auto pos = meshData->positions[vertex.positionIdx];
+        bufferData.push_back(pos.x);
+        bufferData.push_back(pos.y);
+        bufferData.push_back(pos.z);
 
-    auto indexData = generateIndexData(meshData);
-    geometryBuffer.setIndexData(indexData.data(), sizeof(int) * indexData.size());
-  }
+        auto normal = glm::vec3(0, 0, 0);
+        if (vertex.normalIdx.has_value()) {
+          normal = meshData->normals[vertex.normalIdx.value()];
+        }
+        bufferData.push_back(normal.x);
+        bufferData.push_back(normal.y);
+        bufferData.push_back(normal.z);
 
-  std::vector<float> generatePositionData(const utils::MeshData *meshData) {
-    std::vector<float> positionData(meshData->positions.size() * VERTEX_PER_POLYGON);
-    int index = 0;
-    for (auto &position : meshData->positions) {
-      for (unsigned int i = 0; i < VERTEX_PER_POLYGON; i++) {
-        positionData[index] = position[i];
-        index++;
+        auto coord = glm::vec2(0, 0);
+        if (vertex.normalIdx.has_value()) {
+          coord = meshData->textureCoordinates[vertex.textureCoordinateIdx.value()];
+        }
+        bufferData.push_back(coord.x);
+        bufferData.push_back(coord.y);
       }
     }
-    return positionData;
-  }
 
-  std::vector<int> generateIndexData(const utils::MeshData *meshData) {
-    std::vector<int> indexData(meshData->faces.size() * VERTEX_PER_POLYGON);
-    int index = 0;
-    for (auto &face : meshData->faces) {
-      for (auto &idx : face.indices) {
-        indexData[index] = idx.positionIdx;
-        index++;
-      }
-    }
-    return indexData;
+    geometryBuffer.setData(bufferData.data(), bufferData.size() * sizeof(float));
   }
 
   void Mesh::draw() const {
