@@ -1,8 +1,6 @@
 #include <string>
-
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
-#include <iostream>
 #include <engine/utils/meshloader.hpp>
 #include <engine/graphics/core/mesh.h>
 #include <engine/graphics/core/texture.hpp>
@@ -11,22 +9,20 @@
 #include "engine/graphics/camera.hpp"
 #include <glm/gtx/transform.hpp>
 #include <engine/input/inputmanager.hpp>
+#include <engine/math/directions.h>
+#include <map>
 
 class Flyer {
 public:
   void update(float dt) {
-    auto move = glm::vec3(0, 0, 0);
-    if (input::InputManager::isKeyPressed(input::Key::W)) {
-      move += glm::vec3(0, 0, -1);
+    auto move = math::zero;
+    for(auto& [key, direction] : keyToDirection) {
+      if (input::InputManager::isKeyPressed(key)) {
+        move += direction;
+      }
     }
-    if (input::InputManager::isKeyPressed(input::Key::S)) {
-      move += glm::vec3(0, 0, 1);
-    }
-    if (input::InputManager::isKeyPressed(input::Key::D)) {
-      move += glm::vec3(1, 0, 0);
-    }
-    if (input::InputManager::isKeyPressed(input::Key::A)) {
-      move += glm::vec3(-1, 0, 0);
+    if (glm::length(move) > 1) {
+      move = glm::normalize(move);
     }
     position += move * dt * speed;
   }
@@ -35,7 +31,13 @@ public:
 
 private:
   glm::vec3 position = glm::vec3(0, 0, 0);
-  float speed = 5.f;
+  const float speed = 5.f;
+  const std::map<input::Key, glm::vec3> keyToDirection = {
+          {input::Key::W, math::forward},
+          {input::Key::S, math::backwards},
+          {input::Key::A, math::left},
+          {input::Key::D, math::right},
+  };
 };
 
 class TimeManager {
