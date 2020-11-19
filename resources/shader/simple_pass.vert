@@ -8,9 +8,11 @@ layout(location = 0) out vec4 out_normal;
 layout(location = 1) out vec2 out_texCoords;
 
 layout(location = 0) uniform mat4 c_modelViewProjection;
+layout(location = 1) uniform mat4 c_modelProjection;
 
 void main()
 {
     gl_Position = c_modelViewProjection * vec4(in_position, 1);
     out_texCoords = in_texCoords;
+    out_normal = c_modelProjection * vec4(in_normal, 0);
 }
