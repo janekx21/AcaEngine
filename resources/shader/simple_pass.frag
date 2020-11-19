@@ -9,7 +9,9 @@ layout(location = 0) out vec4 out_color;
 
 void main()
 {
-    vec3 diffuse = texture(tx_diffuse, in_texCoord).rgb;
-    float light = max(dot(vec3(1, 0, 0), in_normal.xyz), 0);
-    out_color = vec4(diffuse * light, 1);
+    vec3 albedo = texture(tx_diffuse, in_texCoord).rgb;
+    float diffuse = max(dot(vec3(1, 0, 0), in_normal.xyz), 0);
+    float ambient = .2;
+    float light = diffuse + ambient;
+    out_color = vec4(albedo * light, 1);
 }
