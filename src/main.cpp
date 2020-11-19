@@ -24,14 +24,21 @@ public:
     if (glm::length(move) > 1) {
       move = glm::normalize(move);
     }
-    position += move * dt * speed;
+    if (glm::length(velocity) > 0) {
+      velocity += -glm::normalize(velocity) * glm::length(velocity) * friction * dt;
+    }
+
+    velocity += move * acceleration * dt;
+    position += velocity * dt;
   }
 
   glm::vec3 getPosition() { return position; }
 
 private:
-  glm::vec3 position = glm::vec3(0, 0, 0);
-  const float speed = 5.f;
+  glm::vec3 position = math::zero;
+  glm::vec3 velocity = math::zero;
+  const float friction = 10.f;
+  const float acceleration = 100.f;
   const std::map<input::Key, glm::vec3> keyToDirection = {
           {input::Key::W, math::forward},
           {input::Key::S, math::backwards},
@@ -110,7 +117,7 @@ int main(int argc, char *argv[]) {
     camera.setView(glm::translate(-flyer.getPosition()));
 
     auto modelMatrix = glm::translate(glm::vec3(0, 0, -3.0))
-                       * glm::rotate(glm::pi<float>() * time.getTime() * .0003f, glm::vec3(0, 1, 0));
+                       * glm::rotate(glm::pi<float>() * time.getTime() * .3f, glm::vec3(0, 1, 0));
 
     program.setUniform(mvpLocation, camera.getViewProjection() * modelMatrix);
     program.setUniform(mLocation, modelMatrix);
