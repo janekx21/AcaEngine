@@ -30,7 +30,7 @@ namespace input
 		static bool isButtonPressed(MouseButton _button);
 		static ActionState getButtonState(MouseButton _button);
 		static glm::vec2 getCursorPos();
-    static glm::vec2 getDeltaCursorPos();
+		static glm::vec2 getDeltaCursorPos();
 		enum struct CursorMode {
 			NORMAL,
 			HIDDEN,
@@ -46,7 +46,7 @@ namespace input
 		static GLFWwindow* s_window;
 		static std::array<ActionState, static_cast<size_t>(Key::Count)> m_keyStates;
 		static std::array<ActionState, static_cast<size_t>(Key::Count)> m_buttonStates;
-    static glm::vec2 cursorPosition;
+		static glm::vec2 cursorPosition;
 		static glm::vec2 lastCursorPosition;
 	};
 
