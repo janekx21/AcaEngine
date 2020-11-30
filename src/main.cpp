@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
 
 		camera.setView(glm::mat4(flyer.getRotation()) * glm::translate(-flyer.getPosition()));
 
-		auto modelMatrix = glm::translate(glm::vec3(0, 0, -3.0))
+		auto modelMatrix = glm::translate(glm::vec3(10.f, 0.f, 0.f))
 											 * glm::rotate(glm::pi<float>() * time.getTime() * .3f, glm::vec3(0, 1, 0));
 
 		meshRenderer.draw(mesh, *texture, modelMatrix);
