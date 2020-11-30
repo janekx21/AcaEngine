@@ -13,6 +13,14 @@
 #include <map>
 #include <thread>
 
+// CRT's memory leak detection
+#ifndef NDEBUG
+#if defined(_MSC_VER)
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#endif
+#endif
+
 using namespace std::chrono_literals;
 
 class Flyer {
@@ -102,6 +110,13 @@ private:
 
 
 int main(int argc, char *argv[]) {
+#ifndef NDEBUG
+#if defined(_MSC_VER)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//	_CrtSetBreakAlloc(2760);
+#endif
+#endif
+
 	graphics::Device::initialize(1366, 768, false);
 	GLFWwindow *window = graphics::Device::getWindow();
 	input::InputManager::initialize(window);
@@ -144,6 +159,7 @@ int main(int argc, char *argv[]) {
 		std::this_thread::sleep_for(10ms);
 	}
 
+	utils::MeshLoader::clear();
 	graphics::Device::close();
 	return EXIT_SUCCESS;
 }
