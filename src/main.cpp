@@ -1,19 +1,16 @@
-#include <string>
 #include <GLFW/glfw3.h>
-#include <spdlog/spdlog.h>
-#include <engine/utils/meshloader.hpp>
-#include <engine/graphics/core/mesh.h>
-#include <engine/graphics/core/texture.hpp>
+#include "engine/utils/meshloader.hpp"
+#include "engine/graphics/renderer/mesh.hpp"
+#include "engine/graphics/core/texture.hpp"
 #include "engine/graphics/core/device.hpp"
 #include "engine/graphics/core/shader.hpp"
 #include "engine/graphics/camera.hpp"
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <engine/input/inputmanager.hpp>
-#include <engine/math/directions.h>
+#include "engine/input/inputmanager.hpp"
+#include "engine/math/directions.h"
+#include "engine/graphics/renderer/meshrenderer.hpp"
 #include <map>
-#include <iostream>
 #include <thread>
 
 using namespace std::chrono_literals;
@@ -70,7 +67,7 @@ private:
 
   void applyRotation() {
     auto deltaMouse = input::InputManager::getDeltaCursorPos();
-    auto deltaRot = glm::angleAxis(deltaMouse.x * .01f, math::up);
+    auto deltaRot = glm::angleAxis(deltaMouse.x * .002f, math::up); // * glm::angleAxis(-deltaMouse.y * .002f, rotation * math::right);
     rotation *= deltaRot;
   }
 };
@@ -109,15 +106,6 @@ int main(int argc, char *argv[]) {
   GLFWwindow *window = graphics::Device::getWindow();
   input::InputManager::initialize(window);
 
-  auto vertexShader = graphics::Shader::load("../resources/shader/simple_pass.vert", graphics::ShaderType::VERTEX,
-                                             nullptr);
-  auto fragmentShader = graphics::Shader::load("../resources/shader/simple_pass.frag", graphics::ShaderType::FRAGMENT,
-                                               nullptr);
-  auto program = graphics::Program();
-  program.attach(vertexShader);
-  program.attach(fragmentShader);
-  program.link();
-
   auto sampler = graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
                                    graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
   auto texture = graphics::Texture2D::load("../resources/textures/planet1.png", sampler, false);
@@ -127,13 +115,10 @@ int main(int argc, char *argv[]) {
 
   auto flyer = Flyer();
   auto time = TimeManager();
+  auto meshRenderer = graphics::MeshRenderer();
 
   // permanent settings
   glClearColor(.25f, .2f, .2f, 1);
-  texture->bind(0);
-  program.use();
-  auto mvpLocation = program.getUniformLoc("c_modelViewProjection");
-  auto mLocation = program.getUniformLoc("c_modelProjection");
   glEnable(GL_DEPTH_TEST);
 
   while (!glfwWindowShouldClose(window)) {
@@ -147,13 +132,13 @@ int main(int argc, char *argv[]) {
     auto modelMatrix = glm::translate(glm::vec3(0, 0, -3.0))
                        * glm::rotate(glm::pi<float>() * time.getTime() * .3f, glm::vec3(0, 1, 0));
 
-    program.setUniform(mvpLocation, camera.getViewProjection() * modelMatrix);
-    program.setUniform(mLocation, modelMatrix);
+    meshRenderer.draw(mesh, *texture, modelMatrix);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    mesh.draw();
-
+    meshRenderer.present(camera);
     glfwSwapBuffers(window);
+
+    meshRenderer.clear();
     time.resetDeltaTime();
     input::InputManager::update();
     std::this_thread::sleep_for(10ms);
