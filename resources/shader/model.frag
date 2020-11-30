@@ -9,12 +9,12 @@ layout(location = 0) out vec4 out_color;
 
 void main()
 {
-    vec3 lightDirection = normalize(vec3(-.8, -.7, -.9));
-    vec3 albedo = texture(albedo_texture, in_texCoord).rgb;
+	vec3 lightDirection = normalize(vec3(-.8, -.7, -.9));
+	vec3 albedo = texture(albedo_texture, in_texCoord).rgb;
 
-    float diffuse = max(dot(in_normal, -lightDirection), 0);
-    float ambient = .2;
+	float diffuse = max(dot(in_normal, -lightDirection), 0);
+	float ambient = .2;
 
-    float light = diffuse + ambient;
-    out_color = vec4(albedo * light, 1);
+	float light = diffuse + ambient;
+	out_color = vec4(albedo * light, 1);
 }
