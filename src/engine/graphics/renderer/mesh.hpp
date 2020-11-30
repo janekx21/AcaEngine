@@ -1,12 +1,16 @@
 #pragma once
 
-#include "../../utils/meshLoader.hpp"
+#include <vector>
+#include "engine/graphics/core/geometrybuffer.hpp"
 
 namespace graphics {
-
-	class Mesh
-	{
+	class Mesh {
 	public:
-		Mesh(const utils::MeshData& _meshData) {}
+		Mesh(const std::string &path);
+		void draw() const;
+
+	private:
+		static const std::vector<VertexAttribute> attributes;
+		GeometryBuffer geometryBuffer;
 	};
 }
