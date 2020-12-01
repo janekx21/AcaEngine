@@ -37,7 +37,7 @@ public:
 	glm::quat getRotation() { return rotation; }
 
 private:
-	glm::vec3 position = math::zero;
+	glm::vec3 position = glm::vec3{-5,1,0};
 	glm::quat rotation = glm::identity<glm::quat>();
 	glm::vec3 velocity = math::zero;
 	const float friction = 10.f;
@@ -124,7 +124,9 @@ int main(int argc, char *argv[]) {
 	auto sampler = graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
 																	 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
 	auto texture = graphics::Texture2D::load("../resources/textures/planet1.png", sampler, false);
+	auto texture2 = graphics::Texture2D::load("../resources/textures/sun1.png", sampler, false);
 	auto mesh = graphics::Mesh("models/sphere.obj");
+	auto mesh2 = graphics::Mesh("models/cube.obj");
 
 	auto camera = graphics::Camera(90, .1f, 100);
 
@@ -136,6 +138,10 @@ int main(int argc, char *argv[]) {
 	glClearColor(.25f, .2f, .2f, 1);
 	glEnable(GL_DEPTH_TEST);
 
+	float speed_z = 10;
+	float trans_z = 0;
+	
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		float dt = time.getDeltaTime();
@@ -143,11 +149,29 @@ int main(int argc, char *argv[]) {
 		flyer.update(dt);
 
 		camera.setView(glm::mat4(flyer.getRotation()) * glm::translate(-flyer.getPosition()));
+		// Spring example
 
-		auto modelMatrix = glm::translate(glm::vec3(10.f, 0.f, 0.f))
+	
+		auto modelMatrix = glm::translate(glm::vec3(0.f, 0.f, 0.f))
 											 * glm::rotate(glm::pi<float>() * time.getTime() * .3f, glm::vec3(0, 1, 0));
+		
+		// physics_spring
+
+		/*modelMatrix = glm::translate(glm::vec3(0.f, 0.f, trans_z));
+		trans_z += speed_z *dt;
+		speed_z += -trans_z *0.005f;
+		*/
+
+		//physics_bounce
+
+		/*modelMatrix *= glm::translate(glm::vec3(0.f, abs(trans_z),0.f ));
+		trans_z += speed_z * dt;
+		speed_z += -trans_z * 0.5f;
+		auto modelMatrix2 = glm::translate(glm::vec3(0.f, -2.f, 0.f));
+		meshRenderer.draw(mesh2, *texture2, modelMatrix2);*/
 
 		meshRenderer.draw(mesh, *texture, modelMatrix);
+		
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		meshRenderer.present(camera);
