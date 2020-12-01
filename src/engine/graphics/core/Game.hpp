@@ -3,12 +3,12 @@
 #include <chrono>
 #include <vector>
 #include <memory>
+#include <GLFW/glfw3.h>
 class Game
 {
 public:
 	// initialize global resources
-	float clock;
-	float delta_t;
+
 
 	Game();
 	// finalize global resources
@@ -17,6 +17,7 @@ public:
 	void run(std::unique_ptr<GameState> _initialState);
 
 private:
-	std::vector<GameState*> states;
+	std::vector<std::unique_ptr<GameState>> states;
+	GLFWwindow* window;
 };
 

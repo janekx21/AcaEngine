@@ -3,30 +3,18 @@
 #include "GameState.hpp"
 #include "memory"
 #include <vector>
+#include <engine/graphics/core/sampler.hpp>
+#include <engine/graphics/core/texture.hpp>
+#include "engine/graphics/renderer/mesh.hpp"
+#include "engine/graphics/camera.hpp"
+#include "engine/graphics/renderer/meshrenderer.hpp"
 
-Game::Game()
-{
-	using clock = std::chrono::high_resolution_clock;
-	using delta_t = std::chrono::duration<float>;
+
+void GameState::Cleanup() {
+	meshRenderer.clear();
 }
 
-Game::~Game()
-{
-	//cleanup();
 
-}
-
-void Game::run(std::unique_ptr<GameState> _initialState)
-{
-	while (!states.empty()) {
-		GameState& current = *states.back();
-
-		// .. update, render state
-
-		if (current.isFinished()) {
-			states.pop_back();
-		}
-
-	}
-}
-
+bool GameState::isFinished() {
+	return GameState::is_finished;
+};

@@ -19,8 +19,10 @@
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
+#include <engine/graphics/core/Game.hpp>
 #endif
-
+#include <engine\graphics\core\hSpring.h>
+/*
 using namespace std::chrono_literals;
 
 class Flyer {
@@ -107,7 +109,7 @@ private:
 	clock::time_point lastResetMoment;
 	float deltaTime = 0;
 };
-
+*/
 
 int main(int argc, char *argv[]) {
 #ifndef NDEBUG
@@ -116,7 +118,10 @@ int main(int argc, char *argv[]) {
 	//	_CrtSetBreakAlloc(2760);
 #endif
 #endif
-
+	Game game;
+	hSpring test;
+	game.run(std::make_unique<hSpring>(test));
+/*
 	graphics::Device::initialize(1366, 768, false);
 	GLFWwindow *window = graphics::Device::getWindow();
 	input::InputManager::initialize(window);
@@ -168,7 +173,7 @@ int main(int argc, char *argv[]) {
 		trans_z += speed_z * dt;
 		speed_z += -trans_z * 0.5f;
 		auto modelMatrix2 = glm::translate(glm::vec3(0.f, -2.f, 0.f));
-		meshRenderer.draw(mesh2, *texture2, modelMatrix2);*/
+		meshRenderer.draw(mesh2, *texture2, modelMatrix2);
 
 		meshRenderer.draw(mesh, *texture, modelMatrix);
 		
@@ -186,4 +191,5 @@ int main(int argc, char *argv[]) {
 	utils::MeshLoader::clear();
 	graphics::Device::close();
 	return EXIT_SUCCESS;
+	*/
 }
