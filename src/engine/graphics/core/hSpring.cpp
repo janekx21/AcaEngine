@@ -1,12 +1,10 @@
-#include "GameState.hpp"
 #include "hSpring.h"
+#include "engine/game/GameState.hpp"
 #include <glm\fwd.hpp>
 #include <glm\gtx\transform.hpp>
 
 
-
-
-	void hSpring::onPause() {
+void hSpring::onPause() {
 	}
 
 	void hSpring::onResume() {

@@ -1,15 +1,16 @@
-#include <GLFW/glfw3.h>
-#include "engine/utils/meshloader.hpp"
-#include "engine/graphics/renderer/mesh.hpp"
-#include "engine/graphics/core/texture.hpp"
+#include "Game.hpp"
+#include "engine/graphics/camera.hpp"
 #include "engine/graphics/core/device.hpp"
 #include "engine/graphics/core/shader.hpp"
-#include "engine/graphics/camera.hpp"
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include "engine/graphics/core/texture.hpp"
+#include "engine/graphics/renderer/mesh.hpp"
+#include "engine/graphics/renderer/meshrenderer.hpp"
 #include "engine/input/inputmanager.hpp"
 #include "engine/math/directions.h"
-#include "engine/graphics/renderer/meshrenderer.hpp"
+#include "engine/utils/meshloader.hpp"
+#include <GLFW/glfw3.h>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/transform.hpp>
 #include <map>
 #include <thread>
 
@@ -19,7 +20,7 @@
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
-#include <engine/graphics/core/Game.hpp>
+#include <engine/game/Game.hpp>
 #endif
 #include <engine\graphics\core\hSpring.h>
 /*
@@ -118,7 +119,7 @@ int main(int argc, char *argv[]) {
 	//	_CrtSetBreakAlloc(2760);
 #endif
 #endif
-	Game game;
+	game::Game game;
 	hSpring test;
 	game.run(std::make_unique<hSpring>(test));
 /*

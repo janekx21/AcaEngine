@@ -1,7 +1,8 @@
 #pragma once
 #include "GameState.hpp"
+#include "engine/game/GameState.hpp"
 
-class hSpring : public GameState {
+class hSpring : public game::GameState {
 
 	void onPause();
 	void onResume();

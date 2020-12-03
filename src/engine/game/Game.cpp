@@ -2,20 +2,20 @@
 #include "GameState.hpp"
 #include "engine/graphics/core/device.hpp"
 #include "memory"
-#include <vector>
+#include <GLFW\glfw3.h>
 #include <chrono>
 #include <engine/input/inputmanager.hpp>
-#include <GLFW\glfw3.h>
 #include <thread>
+#include <vector>
 
-Game::Game()
+game::Game::Game()
 {
 	graphics::Device::initialize(1366, 768, false);
 	GLFWwindow* window = graphics::Device::getWindow();
 	input::InputManager::initialize(window);
 }
 
-Game::~Game()
+game::Game::~Game()
 {
 	while (!states.empty()) {
 		GameState& current = *states.back();
@@ -27,7 +27,7 @@ Game::~Game()
 
 }
 
-void Game::run(std::unique_ptr<GameState> _initialState)
+void game::Game::run(std::unique_ptr<GameState> _initialState)
 {
 	states.push_back(_initialState);
 	using clock = std::chrono::high_resolution_clock;

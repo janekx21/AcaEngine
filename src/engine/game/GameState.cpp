@@ -10,11 +10,11 @@
 #include "engine/graphics/renderer/meshrenderer.hpp"
 
 
-void GameState::Cleanup() {
+void game::GameState::Cleanup() {
 	meshRenderer.clear();
 }
 
 
-bool GameState::isFinished() {
+bool game::GameState::isFinished() {
 	return GameState::is_finished;
 };
