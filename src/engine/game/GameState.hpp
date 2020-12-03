@@ -4,7 +4,7 @@ namespace game {
 	class GameState
 	{
 	public:
-		GameState();
+		explicit GameState() = default;
 		virtual void onPause() = 0;
 		virtual void onResume() = 0;
 

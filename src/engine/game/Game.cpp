@@ -1,9 +1,10 @@
 #include "Game.hpp"
 #include "engine/graphics/core/device.hpp"
+#include "engine/input/inputmanager.hpp"
 #include <GLFW\glfw3.h>
 #include <chrono>
+#include <engine/utils/meshloader.hpp>
 #include <memory>
-#include "engine/input/inputmanager.hpp"
 #include <thread>
 
 game::Game::Game() {
@@ -18,6 +19,8 @@ game::Game::~Game() {
 		states.pop_back();
 	}
 	states.clear();
+	utils::MeshLoader::clear();
+	graphics::Device::close();
 }
 
 void game::Game::run(std::unique_ptr<GameState> _initialState) {
@@ -34,7 +37,7 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 		Duration time = beginTimePoint - now;
 		Duration dt = now - previousTimePoint;
 		if (targetFrameTime > dt) {
-			std::this_thread::sleep_for(targetFrameTime - dt);
+			// std::this_thread::sleep_for(targetFrameTime - dt);
 		}
 
 		// do { now = Clock::now(); } while (now - previousTimePoint < targetFrameTime);
@@ -43,12 +46,13 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 		// time += dt.count();
 
 		GameState &current = *states.back();
+		glfwPollEvents();
 		current.update(time.count(), dt.count());
-		current.draw(time.count(), dt.count());
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		current.draw(time.count(), dt.count());
 		glfwSwapBuffers(graphics::Device::getWindow());
+
 		while (current.getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {
 			states.pop_back();
 			if (states.empty()) break;

@@ -25,4 +25,4 @@ namespace game {
 		float speed_z;
 		float trans_z;
 	};
-}// namespace game
+}
