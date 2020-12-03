@@ -22,7 +22,7 @@ namespace game {
 		graphics::MeshRenderer meshRenderer;
 		graphics::Mesh mesh;
 		graphics::Texture2D::Handle texture;
-		float speed_z;
-		float trans_z;
+		float velocity;
+		float position;
 	};
 }

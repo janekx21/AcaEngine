@@ -1,7 +1,5 @@
 #pragma once
 #include "GameState.hpp"
-#include <GLFW/glfw3.h>
-#include <chrono>
 #include <memory>
 #include <vector>
 namespace game {

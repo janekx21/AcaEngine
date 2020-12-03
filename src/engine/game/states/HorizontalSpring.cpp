@@ -2,9 +2,9 @@
 #include <glm/gtx/transform.hpp>
 
 void game::HorizontalSpring::update(float _time, float _deltaTime) {
-	speed_z += -trans_z * 0.005f;
-	trans_z += speed_z * _deltaTime;
-	// modelMatrix = glm::translate(glm::vec3(0.f, 0.f, trans_z));
+	velocity -= position * _deltaTime * 8;
+	position += velocity * _deltaTime;
+	modelMatrix = glm::translate(glm::vec3(position, 0, 0));
 }
 
 void game::HorizontalSpring::draw(float _time, float _deltaTime) {
@@ -13,14 +13,17 @@ void game::HorizontalSpring::draw(float _time, float _deltaTime) {
 	meshRenderer.present(camera);
 }
 
-game::HorizontalSpring::HorizontalSpring() : game::GameState(), camera(graphics::Camera(90, .1f, 100)), mesh(graphics::Mesh("models/sphere.obj")), modelMatrix(glm::identity<glm::mat4>()) {
+game::HorizontalSpring::HorizontalSpring() : game::GameState(),
+																						 camera(graphics::Camera(90, .1f, 100)),
+																						 mesh(graphics::Mesh("models/sphere.obj")),
+																						 meshRenderer(),
+																						 modelMatrix(glm::identity<glm::mat4>()) {
 	auto sampler = graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
 																	 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
 	texture = graphics::Texture2D::load("../resources/textures/planet1.png", sampler, false);
-	meshRenderer = graphics::MeshRenderer();
-	speed_z = 10;
-	trans_z = 0;
-	// modelMatrix = glm::translate(glm::vec3(0.f, 0.f, 0.f));
+	velocity = 10;
+	position = 0;
+	camera.setView(glm::translate(glm::vec3(0, 0, -5)));
 }
 
 bool game::HorizontalSpring::getIsFinished() {

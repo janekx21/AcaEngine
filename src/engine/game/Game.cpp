@@ -3,7 +3,7 @@
 #include "engine/input/inputmanager.hpp"
 #include <GLFW\glfw3.h>
 #include <chrono>
-#include <engine/utils/meshloader.hpp>
+#include "engine/utils/meshloader.hpp"
 #include <memory>
 #include <thread>
 
@@ -11,11 +11,12 @@ game::Game::Game() {
 	graphics::Device::initialize(1366, 768, false);
 	GLFWwindow *window = graphics::Device::getWindow();
 	input::InputManager::initialize(window);
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(.1f, .1f, .15f, 1);
 }
 
 game::Game::~Game() {
 	while (!states.empty()) {
-		GameState &current = *states.back();
 		states.pop_back();
 	}
 	states.clear();
@@ -29,21 +30,22 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 	using Duration = std::chrono::duration<float>;
 
 	states.push_back(std::move(_initialState));
+
 	TimePoint beginTimePoint = Clock::now();
 	TimePoint previousTimePoint = beginTimePoint;
 	Duration targetFrameTime = Duration(1.0 / 60.0);
+
 	while (!states.empty()) {
 		auto now = Clock::now();
-		Duration time = beginTimePoint - now;
+		Duration time = now - beginTimePoint;
 		Duration dt = now - previousTimePoint;
 		if (targetFrameTime > dt) {
-			// std::this_thread::sleep_for(targetFrameTime - dt);
+			std::this_thread::sleep_for(targetFrameTime - dt);
 		}
 
 		// do { now = Clock::now(); } while (now - previousTimePoint < targetFrameTime);
 		// dt = now - previousTimePoint;
-		// previousTimePoint = now;
-		// time += dt.count();
+		previousTimePoint = now;
 
 		GameState &current = *states.back();
 		glfwPollEvents();
