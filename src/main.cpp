@@ -1,5 +1,5 @@
-#include "Game.hpp"
-#include "HorizontalSpring.h"
+#include "engine/game/Game.hpp"
+#include "engine/game/states/HorizontalSpring.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/core/device.hpp"
 #include "engine/graphics/core/shader.hpp"

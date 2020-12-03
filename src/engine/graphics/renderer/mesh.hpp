@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include "engine/graphics/core/geometrybuffer.hpp"
 
 namespace graphics {

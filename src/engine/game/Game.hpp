@@ -1,9 +1,9 @@
 #pragma once
 #include "GameState.hpp"
-#include <chrono>
-#include <vector>
-#include <memory>
 #include <GLFW/glfw3.h>
+#include <chrono>
+#include <memory>
+#include <vector>
 namespace game {
 	class Game
 	{

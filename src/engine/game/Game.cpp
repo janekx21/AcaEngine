@@ -49,9 +49,11 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glfwSwapBuffers(graphics::Device::getWindow());
-		if (current.getIsFinished()) {
+		while (current.getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {
 			states.pop_back();
-			states.back()->onResume();
+			if (states.empty()) break;
+			current = *states.back();
+			current.onResume();
 		}
 	}
 }
