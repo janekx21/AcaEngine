@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "HorizontalSpring.h"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/core/device.hpp"
 #include "engine/graphics/core/shader.hpp"
@@ -22,7 +23,7 @@
 #endif
 #include <engine/game/Game.hpp>
 #endif
-#include <engine\graphics\core\hSpring.h>
+#include <engine/game/states/HorizontalSpring.hpp>
 /*
 using namespace std::chrono_literals;
 
@@ -120,8 +121,8 @@ int main(int argc, char *argv[]) {
 #endif
 #endif
 	game::Game game;
-	hSpring test;
-	game.run(std::make_unique<hSpring>(test));
+	game::HorizontalSpring test;
+	game.run(std::make_unique<game::HorizontalSpring>(test));
 /*
 	graphics::Device::initialize(1366, 768, false);
 	GLFWwindow *window = graphics::Device::getWindow();
