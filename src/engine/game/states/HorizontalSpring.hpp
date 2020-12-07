@@ -4,6 +4,7 @@
 #include "engine/graphics/core/texture.hpp"
 #include "engine/graphics/renderer/mesh.hpp"
 #include "engine/graphics/renderer/meshrenderer.hpp"
+#include "engine/game/Flyer.hpp"
 
 namespace game {
 	class HorizontalSpring : public game::GameState {
@@ -13,7 +14,7 @@ namespace game {
 		void onResume() override{};
 
 		void update(float _time, float _deltaTime) override;
-		void draw(float _time, float _deltaTime) override;
+		void draw(float _time, float _deltaTime, Flyer &_flyer) override;
 		bool getIsFinished() override;
 
 	private:

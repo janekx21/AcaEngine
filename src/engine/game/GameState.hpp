@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Flyer.hpp"
 namespace game {
 	class GameState
 	{
@@ -9,7 +9,7 @@ namespace game {
 		virtual void onResume() = 0;
 
 		virtual void update(float _time, float _deltaTime) = 0;
-		virtual void draw(float _time, float _deltaTime) = 0;
+		virtual void draw(float _time, float _deltaTime, Flyer &_flyer) = 0;
 
 		virtual bool getIsFinished() = 0;
 	};

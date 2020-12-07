@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "Flyer.hpp"
 #include "engine/graphics/core/device.hpp"
 #include "engine/input/inputmanager.hpp"
 #include <GLFW\glfw3.h>
@@ -29,6 +30,8 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 	using Clock = std::chrono::high_resolution_clock;
 	using Duration = std::chrono::duration<float>;
 
+	auto flyer = game::Flyer::Flyer();
+
 	states.push_back(std::move(_initialState));
 
 	TimePoint beginTimePoint = Clock::now();
@@ -50,9 +53,8 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 		GameState &current = *states.back();
 		glfwPollEvents();
 		current.update(time.count(), dt.count());
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		current.draw(time.count(), dt.count());
+		current.draw(time.count(), dt.count(), flyer);
 		glfwSwapBuffers(graphics::Device::getWindow());
 
 		while (current.getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {

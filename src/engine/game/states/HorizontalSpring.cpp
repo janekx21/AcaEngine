@@ -7,9 +7,11 @@ void game::HorizontalSpring::update(float _time, float _deltaTime) {
 	modelMatrix = glm::translate(glm::vec3(position, 0, 0));
 }
 
-void game::HorizontalSpring::draw(float _time, float _deltaTime) {
+void game::HorizontalSpring::draw(float _time, float _deltaTime, game::Flyer &_flyer) {
 	meshRenderer.clear();
 	meshRenderer.draw(mesh, *texture, modelMatrix);
+	_flyer.update(_deltaTime);
+	camera.setView(_flyer.getView());
 	meshRenderer.present(camera);
 }
 
