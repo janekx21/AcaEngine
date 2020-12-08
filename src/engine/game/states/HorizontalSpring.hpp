@@ -15,6 +15,7 @@ namespace game {
 
 		void update(float _time, float _deltaTime) override;
 		void draw(float _time, float _deltaTime, Flyer &_flyer) override;
+		bool pushNext() override;
 		bool getIsFinished() override;
 
 	private:
@@ -25,5 +26,6 @@ namespace game {
 		graphics::Texture2D::Handle texture;
 		float velocity;
 		float position;
+		bool end;
 	};
 }

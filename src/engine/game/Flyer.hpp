@@ -11,6 +11,7 @@ namespace game {
 		~Flyer();
 		void update(float dt);
 		glm::vec3 getPosition();
+		void setView(glm::vec3 _position, glm::vec3 _direction);
 		glm::mat4 getView();
 	private:
 
@@ -36,6 +37,7 @@ namespace game {
 						{input::Key::A, math::left},
 						{input::Key::D, math::right},
 		};
+		
 
 
 		glm::vec3 getMove();

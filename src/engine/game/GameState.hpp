@@ -10,6 +10,7 @@ namespace game {
 
 		virtual void update(float _time, float _deltaTime) = 0;
 		virtual void draw(float _time, float _deltaTime, Flyer &_flyer) = 0;
+		virtual bool pushNext() = 0;
 
 		virtual bool getIsFinished() = 0;
 	};
