@@ -57,7 +57,11 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		current.draw(time.count(), dt.count(), flyer);
 		glfwSwapBuffers(graphics::Device::getWindow());
+
 		input::InputManager::update();
+		if (current.pushNext()) {
+			states.push_back(std::make_unique<game::HorizontalSpring>(next));
+		}
 
 		while (current.getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {
 			states.pop_back();
@@ -66,8 +70,6 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 			current.onResume();
 		}
 
-		if(current.pushNext()) {
-			states.push_back(std::make_unique<game::HorizontalSpring>(next));
-		}
+		
 	}
 }
