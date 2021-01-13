@@ -49,6 +49,7 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 
 		GameState &current = *states.back();
 		glfwPollEvents();
+		input::InputManager::update();
 		current.update(time.count(), dt.count());
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
