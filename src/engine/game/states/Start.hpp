@@ -11,7 +11,7 @@ namespace game {
 	public:
 		Start();
 		void onPause() override {};
-		void onResume() override {};
+		void onResume() override ;
 
 		void update(float _time, float _deltaTime) override;
 		void draw(float _time, float _deltaTime, Flyer& _flyer) override;

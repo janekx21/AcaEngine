@@ -37,8 +37,8 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 	TimePoint beginTimePoint = Clock::now();
 	TimePoint previousTimePoint = beginTimePoint;
 	Duration targetFrameTime = Duration(1.0 / 60.0);
-	
-	while (!states.empty()) {
+	int count_states = 1;
+	while (!states.empty()|| !glfwWindowShouldClose(graphics::Device::getWindow())) {
 		auto now = Clock::now();
 		Duration time = now - beginTimePoint;
 		Duration dt = now - previousTimePoint;
@@ -49,27 +49,39 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 		// do { now = Clock::now(); } while (now - previousTimePoint < targetFrameTime);
 		// dt = now - previousTimePoint;
 		previousTimePoint = now;
-
-		GameState &current = *states.back();
+		GameState* current = states.back().get();
+		
 		
 		glfwPollEvents();
-		current.update(time.count(), dt.count());
+		current->update(time.count(), dt.count());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		current.draw(time.count(), dt.count(), flyer);
+		current->draw(time.count(), dt.count(), flyer);
 		glfwSwapBuffers(graphics::Device::getWindow());
 
 		input::InputManager::update();
-		if (current.pushNext()) {
+		if (current->pushNext()) {
+			current->onPause();
 			states.push_back(std::make_unique<game::HorizontalSpring>(next));
+			current = states.back().get();
+			count_states++;
 		}
 
-		while (current.getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {
+		while (current->getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {
 			states.pop_back();
-			if (states.empty()) break;
-			current = *states.back();
-			current.onResume();
+			count_states--;
+			if (count_states!=0) {
+				current = states.back().get();
+				current->onResume();
+			}
+			if (count_states == 0) {
+				break;
+			}
+		}
+		if (count_states == 0) {
+			break;
 		}
 
 		
 	}
+	
 }

@@ -1,4 +1,5 @@
 #include "Registry.hpp"
+#include "component.hpp"
 
 template<typename T>
 Entity Registry<T>::create()
@@ -36,39 +37,6 @@ std::optional<Entity> Registry<T>::getEntity(EntityRef _ent) const
 {
 	if (_ent.generation == generations[_ent.ent.id] && flags[_ent.ent.id]) {
 		return _ent.ent;
-	}
-}
-
-template<typename T>
-void Registry<T>::setData(Entity _ent, const T& _value)
-{
-	data[_ent.id] = _value;
-}
-
-template<typename T>
-const T& Registry<T>::getData(Entity _ent) const
-{
-	// TODO: insert return statement here
-	return data[_ent.id];
-}
-
-template<typename T>
-T& Registry<T>::getData(Entity _ent)
-{
-	// TODO: insert return statement here
-	return data[_ent.id];
-}
-
-
-template<typename T>
-template<typename FN>
-inline void Registry<T>::execute(FN _fn)
-{
-	uint32_t id;
-	for (id = 0; id < data.size(); id++) {
-		if (flags[id]) {
-			_fn(data[id]);
-		}
 	}
 }
 

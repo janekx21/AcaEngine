@@ -21,6 +21,9 @@ void game::Start::update(float _time, float _deltaTime)
 	}
 
 }
+void game::Start::onResume() {
+	std::cout << "resumed";
+}
 
 void game::Start::draw(float _time, float _deltaTime, Flyer& _flyer)
 {
