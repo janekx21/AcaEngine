@@ -10,18 +10,18 @@ namespace game {
 	class Registry {
 	public:
 		Entity create();
-		void erase(Entity _ent);
-		EntityRef getRef(Entity _ent) const;
-		std::optional<Entity> getEntity(EntityRef _ent) const;
+		void erase(Entity _entity);
+		EntityRef getRef(Entity _entity) const;
+		std::optional<Entity> getEntity(EntityRef _entityRef) const;
 
-		void setData(Entity _ent, const T &_value);
-		const T &getData(Entity _ent) const;
-		T &getData(Entity _ent);
+		void setData(Entity _entity, const T &_value);
+		const T &getData(Entity _entity) const;
+		T &getData(Entity _entity);
 
 		template<typename FN>
-		void execute(FN _fn);
+		void execute(FN _function);
 
-		std::vector<bool> flags;
+		std::vector<bool> idUsed;
 		std::vector<uint32_t> generations;
 		std::vector<T> data;
 	};

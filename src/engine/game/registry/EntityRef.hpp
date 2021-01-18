@@ -3,6 +3,6 @@
 #include <cstdint>
 
 struct EntityRef {
-	Entity ent;
+	Entity entity;
 	uint32_t generation;
 };
