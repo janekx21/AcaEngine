@@ -14,8 +14,7 @@ namespace game {
 		void onResume() override {};
 
 		void update(float _time, float _deltaTime) override;
-		void draw(float _time, float _deltaTime, Flyer& _flyer) override;
-		bool pushNext() override;
+		void draw(float _time, float _deltaTime) override;
 		bool getIsFinished() override;
 
 	private:

@@ -22,24 +22,17 @@ void game::Start::update(float _time, float _deltaTime)
 
 }
 
-void game::Start::draw(float _time, float _deltaTime, Flyer& _flyer)
+void game::Start::draw(float _time, float _deltaTime)
 {
 	meshRenderer.clear();
 	meshRenderer.draw(mesh, *texture, modelMatrix);
-	_flyer.setView(glm::vec3(0, 0, -5), glm::vec3(0, 0, -1));
-	camera.setView(_flyer.getView());
+	// _flyer.setView(glm::vec3(0, 0, -5), glm::vec3(0, 0, -1));
+	// camera.setView(_flyer.getView());
 
 	meshRenderer.present(camera);
 	
 
 }
-
-bool game::Start::pushNext()
-{
-	return start;
-}
-
-
 
 game::Start::Start() : game::GameState(),
 	camera(graphics::Camera(90, .1f, 100)),

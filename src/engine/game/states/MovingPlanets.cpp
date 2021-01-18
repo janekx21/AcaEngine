@@ -6,15 +6,13 @@ void game::MovingPlanets::update(float _time, float _deltaTime) {
 	if (input::InputManager::isKeyPressed(input::Key::ESCAPE)) {
 		end = true;
 	}
-	for (int i = 0; i < planets.size();i++) {
+	for (unsigned int i = 0; i < planets.size();i++) {
 		planets[i].update(_deltaTime);
 	}
 	
 }
 
-void game::MovingPlanets::draw(float _time, float _deltaTime, game::Flyer& _flyer) {
-	
-	
+void game::MovingPlanets::draw(float _time, float _deltaTime) {
 	meshRenderer.clear();
 	/*for (int i = 0; i < planets.size(); i++) {
 		meshRenderer.draw(mesh, *textures[i], planets[i].getModel());
@@ -23,17 +21,11 @@ void game::MovingPlanets::draw(float _time, float _deltaTime, game::Flyer& _flye
 	meshRenderer.draw(mesh, *textures[0], planets[0].getModel());
 	meshRenderer.draw(mesh, *textures[1], planets[1].getModel());
 	meshRenderer.draw(mesh, *textures[2], planets[2].getModel());
-	_flyer.update(_deltaTime);
-	camera.setView(_flyer.getView());
+	// _flyer.update(_deltaTime);
+	// camera.setView(_flyer.getView());
 
 	meshRenderer.present(camera);
 }
-
-bool game::MovingPlanets::pushNext()
-{
-	return false;
-}
-
 
 game::MovingPlanets::MovingPlanets() : game::GameState(),
 camera(graphics::Camera(90, .1f, 2000)),

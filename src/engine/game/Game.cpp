@@ -1,11 +1,9 @@
 #include "Game.hpp"
-#include "engine/graphics/core/device.hpp"
-#include "engine/input/inputmanager.hpp"
 #include <GLFW\glfw3.h>
 #include <chrono>
+#include "engine/graphics/core/device.hpp"
+#include "engine/input/inputmanager.hpp"
 #include "engine/utils/meshloader.hpp"
-#include <memory>
-#include <thread>
 
 game::Game::Game() {
 	graphics::Device::initialize(1366, 768, false);
