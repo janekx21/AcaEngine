@@ -1,4 +1,5 @@
 #include "Registry.hpp"
+#include <typeindex>
 
 namespace game {
 	template class Registry<int>;
