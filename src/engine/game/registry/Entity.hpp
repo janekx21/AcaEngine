@@ -3,5 +3,5 @@
 
 struct Entity {
 	uint32_t id;
-	uint32_t pos;
+	uint32_t archetype;
 };
