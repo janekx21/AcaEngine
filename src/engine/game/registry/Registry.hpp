@@ -14,10 +14,76 @@ namespace game {
 	class Registry {
 
 	public:
-		  Entity create();
-		  void erase(Entity _ent);
-		  EntityRef getRef(Entity _ent) const;
-		  std::optional<Entity> getEntity(EntityRef _ent) const;
+		  
+		Entity create(){
+			uint32_t archetype;
+			uint32_t id;
+			if (archetypes.empty()) {
+				std::vector < size_t > zero_types;
+				std::vector < ComponentType > zero_components;
+				std::vector <uint32_t> zero_entities;
+				Archetype zero_archetype = { zero_types, zero_components, zero_entities};
+				archetypes.push_back(zero_archetype);
+			}
+			for (id = 0; id < flags.size(); id++) {
+				if (flags[id] == 0) {
+					flags[id] = 1;
+					generations[id] += 1;
+					Entity new_entity = { id, 0};
+					archetypes[0].entities.push_back(new_entity.id);
+					return new_entity;
+				}
+			}
+			flags.push_back(1);
+			generations.push_back(1);
+			Entity new_entity = { id, 0 };
+			archetypes[0].entities.push_back(new_entity.id);
+			return new_entity;
+			
+		};
+
+
+		  void erase(Entity _ent) {
+			  flags[_ent.id] = 0;
+			  //TODO:erase components
+			  uint32_t position;
+			  for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
+				  if (archetypes[_ent.archetype].entities[i] == _ent.id) {
+					  position = i;
+					  break;
+				  }
+			  }
+			  bool move_back = true;
+			  for (auto& component_iterator : archetypes[_ent.archetype].components) {
+				  size_t temp_typeSize = component_iterator.typeSize;
+				  if (position == archetypes[_ent.archetype].entities.size()-1) {
+					  component_iterator.data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size()-1);
+					  move_back = false;
+				  }
+				  else {
+					  char* copy_data_src = component_iterator.data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size()-1;
+					  char* copy_data_dst = component_iterator.data.data() + temp_typeSize * position;
+					  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+					  component_iterator.data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size()-1);
+				  }
+			  }
+			  if (move_back) {
+				  archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
+			  }
+			  archetypes[_ent.archetype].entities.pop_back();
+			  
+		  }
+
+		  EntityRef getRef(Entity _ent) const {
+			  return { _ent, generations[_ent.id] };
+		  }
+
+		  std::optional<Entity> getEntity(EntityRef _ent) const {
+			  if (_ent.generation == generations[_ent.ent.id] && flags[_ent.ent.id]) {
+				  return _ent.ent;
+			  }
+		  }
+
 		  // Add a new component to an existing entity. No changes are done if Component
 		  // if_ent already has a component of this type.
 		  // @return A reference to the new component or the already existing component.
@@ -25,7 +91,7 @@ namespace game {
 		  Component& addComponent(Entity _ent, Args&&... _args) {
 			  uint32_t position;
 			  for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
-				  if (archetypes[_ent.archetype].entities[i].id == _ent.id) {
+				  if (archetypes[_ent.archetype].entities[i] == _ent.id) {
 					  position = i;
 					  break;
 				  }
@@ -35,7 +101,8 @@ namespace game {
 			  int count_types = 0;
 			  for (auto& it_types : archetypes[_ent.archetype].types) {
 				  if (it_types == typeid(Component).hash_code()) {
-					  Component& component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[count_types].data.data()+sizeof(Component)*position);
+					  Component& component_reference;
+					  component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[count_types].data.data() + sizeof(Component) * position);
 					  return component_reference;
 				  }
 				  count_types++;
@@ -68,7 +135,6 @@ namespace game {
 					  }
 				  }
 				  if (archetype_exists) {				// move old data to existing archetype
-					  it_archetypes.count_entities++;
 					  bool move_back = true;
 					  bool archetype_empty = false;
 					  for (int i = 0; i < entity_types.size() - 1; i++) {
@@ -76,22 +142,22 @@ namespace game {
 							  if (entity_types[i] == it_archetypes.types[j]) {
 								  size_t temp_typeSize = it_archetypes.components[j].typeSize;
 								  //resize
-								  it_archetypes.components[j].data.resize(temp_typeSize * it_archetypes.count_entities + 1);
+								  it_archetypes.components[j].data.resize(temp_typeSize * it_archetypes.entities.size() + 1);
 								  //set src/dst
 								  char* copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * position;
-								  char* copy_data_dst = it_archetypes.components[j].data.data() * temp_typeSize * it_archetypes.count_entities;
+								  char* copy_data_dst = it_archetypes.components[j].data.data() * temp_typeSize * it_archetypes.entities.size();
 								  //copy
 								  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
 
-								  if (position == archetypes[_ent.archetype].count_entities) { 
-									  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].count_entities);
+								  if (position == archetypes[_ent.archetype].entities.size()) {
+									  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
 									  move_back = false;
 								  }
 								  else {
 									  copy_data_dst = copy_data_src;
-									  copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize* archetypes[_ent.archetype].count_entities;
+									  copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize* archetypes[_ent.archetype].entities.size();
 									  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-									  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].count_entities);
+									  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
 									  
 								  }
 							  }
@@ -100,25 +166,25 @@ namespace game {
 
 					  if (move_back) {
 						  archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
-						  archetypes[_ent.archetype].entities.pop_back();
 					  }
+
+					  archetypes[_ent.archetype].entities.pop_back();
 
 					  for (int j = 0; j < it_archetypes.types.size(); j++) {
 						  if (typeid(Component).hash_code() == it_archetypes.types[j]) {
 							  size_t temp_typeSize = it_archetypes.components[j].typeSize;
 							  count_types = j;
 
-							  it_archetypes.components[j].data.resize(temp_typeSize * it_archetypes.count_entities + 1);
-
+							  it_archetypes.components[j].data.resize(temp_typeSize * it_archetypes.entities.size() + 1);
+							  
 							  Component* copy_data_src = Component(_args...);
-							  char* copy_data_dst = it_archetypes.components[j].data.data() * temp_typeSize * it_archetypes.count_entities;
+							  char* copy_data_dst = it_archetypes.components[j].data.data() * temp_typeSize * it_archetypes.entities.size();
 							  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
 							  break;
 						  }
 					  }
 
-					  archetypes[_ent.archetype].count_entities--; 
-					  it_archetypes.entities.push_back(_ent);
+					  it_archetypes.entities.push_back(_ent.id);
 					  for (int l = 0; l < archetypes.size(); l++) {
 						  if (archetypes[l] == it_archetypes) {
 							  _ent.archetype = l;
@@ -134,10 +200,9 @@ namespace game {
 
 			  std::vector <ComponentType> new_archetype_components;
 			  std::vector <Entity*> new_archetype_entities;
-			  uint32_t new_count = 0;
-			  Archetype new_archetype = { entity_types; new_archetype_components; new_archetype_entities, new_count };
+			  Archetype new_archetype = { entity_types, new_archetype_components, new_archetype_entities};
 			  
-			  bool moved_back = true;
+			  bool move_back = true;
 			  bool archetype_empty = false;
 
 			  for (int i = 0; i < entity_types.size() - 1; i++) {
@@ -153,63 +218,361 @@ namespace game {
 				  ComponentType new_type = { new_data, temp_typeSize };				  
 				  new_archetype.components.push_back(new_type);
 					
-				  ///////////////////////////////////////////////////////////////////////////
-				  //hier weiter
-				  //////////////////////////////////////////////////////////////////////////
-				  if (entityArchetypeMap.at(_ent).components[i][position] == entityArchetypeMap.at(_ent).components[i].back()) {
-					  if (entityArchetypeMap.at(_ent).components[i][position] == entityArchetypeMap.at(_ent).components[i].begin()) {
-						  archetype_empty = true;
-					  }
-					  entityArchetypeMap.at(_ent).components[i].pop_back();
-					  moved_back = false;
+				  if (position == archetypes[_ent.archetype].entities.size()-1) {
+					  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size()-1);
+					  move_back = false;
 				  }
 				  else {
-					  entityArchetypeMap.at(_ent).components[i][position] = entityArchetypeMap.at(_ent).components[i].back();
+					  copy_data_dst = copy_data_src;
+					  copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size()-1;
+					  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+					  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size()-1);
 				  }
 			  }
 			  
 			  if (moved_back) {
-				  for (auto& it_ent : entityArchetypeMap) {
-					  if (entityArchetypeMap.at[it_ent] == entityArchetypeMap.at(_ent) && position == entityArchetypeMap.at(_ent).components[0].size() - 1) {
-						  itposition = position;
-					  }
-				  }
+				  archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
+				  
 			  }
-			  std::vector<T> new_type;
+			  archetypes[_ent.archetype].entities.pop_back();
+
+			  size_t temp_typeSize = sizeof(Component);
+
+			  std::vector<char> new_data;
+			  new_data.resize(temp_typeSize);
+
+			  Component* copy_data_src = Component(_args...);
+			  char* copy_data_dst = new_data.data();
+			  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+
+			  ComponentType new_type = { new_data, temp_typeSize };
 			  new_archetype.components.push_back(new_type);
-			  new_archetype.components[new_archetype.components.size() - 1].push_back(std::any(Component(_args ...)));
 
-			  if (archetype_empty) {
-				  entityArchetypeMap.at(_ent).is_empty = true;
-			  }
-
-			  position = 0;
-			  entityArchetypeMap.at(_ent) = new_archetype;
-
+			  
+			  new_archetype.entities.push_back(_ent.id);
+			  
 			  archetypes.push_back(new_archetype);
-			  //did you push entity on entity*vector?
-			  Component& component_reference = std::any_cast<Component&>(entityArchetypeMap.at(_ent).components[entity_types.size() - 1][position]);
+			  _ent.archetype = archetypes.size() - 1;
+
+			  Component& component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[count_types].data.data());
 			  return component_reference;
 		  }
 		  // Remove a component from an existing entity.// Does not check whether it exists.
 		  template<component_type Component>
-		  void removeComponent(Entity _ent) {}
+		  void removeComponent(Entity _ent) {
+
+			  uint32_t position;
+			  for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
+				  if (archetypes[_ent.archetype].entities[i]== _ent.id) {
+					  position = i;
+					  break;
+				  }
+			  }
+
+			  std::vector<size_t> entity_types;
+			  for (auto& it_types : archetypes[_ent.archetype].types) {
+				  if (it_types != typeid(Component).hash_code()) {
+					  entity_types.push_back(it_types);
+				  }
+			  }
+
+			  //1.CASE new archetype exists already
+			  for (auto& it_archetypes : archetypes) {
+				  bool archetype_exists = true;
+				  for (auto& it_types_entity : entity_types) {
+					  bool type_exists = false;
+					  for (auto& it_types_archetype : it_archetypes.types) {
+						  if (it_types_archetype == it_types_entity) {
+							  type_exists = true;
+							  break;
+						  }
+					  }
+					  if (!type_exists) {
+						  archetype_exists = false;
+						  break;
+					  }
+				  }
+				  if (archetype_exists) {				// move old data to existing archetype
+					  bool move_back = true;
+					  bool archetype_empty = false;
+					  for (int i = 0; i < entity_types.size(); i++) {
+						  for (int j = 0; j < it_archetypes.types.size(); j++) {
+							  if (entity_types[i] == it_archetypes.types[j]) {
+								  size_t temp_typeSize = it_archetypes.components[j].typeSize;
+								  
+								  it_archetypes.components[j].data.resize(temp_typeSize * it_archetypes.entities.size() + 1);
+								  
+								  char* copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * position; 
+								  char* copy_data_dst = it_archetypes.components[j].data.data() * temp_typeSize * it_archetypes.entities.size();
+								  
+								  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+
+								  if (position == archetypes[_ent.archetype].entities.size()) {
+									  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
+									  move_back = false;
+								  }
+								  else {
+									  copy_data_dst = copy_data_src;
+									  copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size();
+									  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+									  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
+
+								  }
+							  }
+						  }
+					  }
+
+					  if (move_back) {
+						  archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
+					  }
+
+					  archetypes[_ent.archetype].entities.pop_back();
+
+					  for (int j = 0; j < archetypes[_ent.archetype].types.size(); j++) {
+						  if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[j]) {
+							  size_t temp_typeSize = sizeof(Component);
+							  if (position == archetypes[_ent.archetype].entities.size()) {
+								  archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
+							  }
+							  else {
+
+								  char* copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size();
+								  char* copy_data_dst = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * position;								 
+								  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+								  archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
+							  }
+							  break;
+						  }
+					  }
+
+					  it_archetypes.entities.push_back(_ent.id);
+					  for (int l = 0; l < archetypes.size(); l++) {
+						  if (archetypes[l] == it_archetypes) {
+							  _ent.archetype = l;
+							  break;
+						  }
+					  }
+					  
+					  return;
+				  }
+			  }
+
+			  //2.CASE new archetype must be created
+
+			  std::vector <ComponentType> new_archetype_components;
+			  std::vector <Entity*> new_archetype_entities;
+			  Archetype new_archetype = { entity_types, new_archetype_components, new_archetype_entities };
+
+			  bool moved_back = true;
+			  bool archetype_empty = false;
+
+			  for (int i = 0; i < entity_types.size(); i++) {
+				  size_t temp_typeSize = archetypes[_ent.archetype].components[i].typeSize;
+				  std::vector<char> new_data;
+				  new_data.resize(temp_typeSize);
+
+				  char* copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * position;
+				  char* copy_data_dst = new_data.data();
+
+				  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+
+				  ComponentType new_type = { new_data, temp_typeSize };
+				  new_archetype.components.push_back(new_type);
+
+				  if (position == archetypes[_ent.archetype].entities.size()-1) {
+					  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size()-1);
+					  move_back = false;
+				  }
+				  else {
+					  copy_data_dst = copy_data_src;
+					  copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size()-1;
+					  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+					  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size()-1);
+				  }
+			  }
+
+
+			  for (int j = 0; j < archetypes[_ent.archetype].types.size(); j++) {
+				  if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[j]) {
+					  size_t temp_typeSize = sizeof(Component);
+					  if (position == archetypes[_ent.archetype].entities.size()-1) {
+						  archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size()-1);
+					  }
+					  else {
+						  char* copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size()-1;
+						  char* copy_data_dst = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * position;
+						  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+						  archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size()-1);
+					  }
+					  break;
+				  }
+			  }
+
+			  if (moved_back) {
+				  archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
+			  }
+			  archetypes[_ent.archetype].entities.pop_back();
+
+			  new_archetype.entities.push_back(_ent.id);
+
+			  archetypes.push_back(new_archetype);
+			  _ent.archetype = archetypes.size() - 1;
+
+			  return;
+
+		  }
 		  // Retrieve a component associated with an entity.
 		  // @return The component or nullptr if the entity has no such component.
 		  template<component_type Component>
-		  Component* getComponent(Entity _ent) {}template<component_type Component>const Component* getComponent(Entity _ent) const {}
+		  Component* getComponent(Entity _ent) {
+			  uint32_t position;
+			  for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
+				  if (archetypes[_ent.archetype].entities[i] == _ent.id) {
+					  position = i;
+					  break;
+				  }
+			  }
+			  for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
+				  if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
+					  Component& component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
+					  return component_reference;
+				  }
+			  }
+			  return nullptr;
+		  }
+		  
+		  
+		  template<component_type Component>
+		  const Component* getComponent(Entity _ent) const {
+			  uint32_t position;
+			  for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
+				  if (archetypes[_ent.archetype].entities[i] == _ent.id) {
+					  position = i;
+					  break;
+				  }
+			  }
+			  for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
+				  if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
+					  Component& component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
+					  return component_reference;
+				  }
+			  }
+			  return nullptr;
+		  }
 		  // Retrieve a component associated with an entity.
 		  // Does not check whether it exits.
 		  template<component_type Component>
-		  Component& getComponentUnsafe(Entity _ent) {}
+		  Component& getComponentUnsafe(Entity _ent) {
+			  uint32_t position;
+			  for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
+				  if (archetypes[_ent.archetype].entities[i] == _ent.id) {
+					  position = i;
+					  break;
+				  }
+			  }
+			  for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
+				  if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
+					  Component& component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
+					  return component_reference;
+				  }
+			  }
+			  return nullptr;
+		  }
 		  template<component_type Component>
-		  const Component& getComponentUnsafe(Entity _ent) const {}
+		  const Component& getComponentUnsafe(Entity _ent) const {
+			  uint32_t position;
+			  for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
+				  if (archetypes[_ent.archetype].entities[i] == _ent.id) {
+					  position = i;
+					  break;
+				  }
+			  }
+			  for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
+				  if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
+					  Component& component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
+					  return component_reference;
+				  }
+			  }
+			  return nullptr;
+		  }
+
+
+
 		  // Execute an Action on all entities having the components
 		  // expected by Action::operator(component_type&...).
 		  // In addition, the entity itself is provided if
 		  // the first parameter is of type Entity.
-		  template<typename Action>
-		  void execute(const Action& _action) {}
+		  template<typename... Args, typename Action>
+		  void execute(const Action& _action) {
+			  bool hasAllComponents;
+			  bool first_is_entity = false;
+			  std::vector<std::size_t> action_types;
+			  std::vector<std::size_t> action_types_size;
+			  (action_types.push_back(typeid(Args).hash_code()), ... );
+			  (action_types_size.push_back(sizeof(Args)), ...);
+			  std::vector<Archetype> action_archetypes;
+
+			  if (action_types.begin() == typeid(Entity).hash_code()) {
+				  first_is_entity = true;
+				  action_types.erase(0);
+				  action_types_size.erase(0);
+			  }
+
+			  for (auto& archetype_iterator : archetypes) {
+				  hasAllComponents = true;				  
+				
+				  for (auto& type_iterator : action_types) {
+					  bool contains_type = false;
+					  for (auto& archetype_type_iterator : archetype_iterator.types) {
+						  if (archetype_type_iterator == type_iterator) {
+							  contains_type = true;
+						  }
+					  }
+					  if (!contains_type) {
+						  hasAllComponents = false;
+					  }	
+				  }
+					
+				  if (hasAllComponents) {
+						action_archetypes.push_back(archetype_iterator);					
+				  }
+			  }
+
+			  for (auto& a_archetypes_iterator : action_archetypes) {
+				  std::vector<std::vector<char>> component_data;
+				  for (int j = 0; j < action_types.size(); j++) {
+					  for (int i = 0; i < a_archetypes_iterator.types.size(); i++) {
+						  if (a_archetypes_iterator.types[i] == action_types[j]) {
+							  size_t temp_size = sizeof(a_archetypes_iterator.components.typeSize) * a_archetypes_iterator.entities.size();
+							  std::vector<char> copy_data_dst;
+							  copy_data_dst.resize(temp_size);
+							  component_data.push_back(copy_data_dst);
+							  memcpy(component_data[j].data(), a_archetypes_iterator.components[i].data.data(), temp_size);
+						  }
+					  }
+				  }
+				  for (int i = 0; i < a_archetypes_iterator.entities.size()-1; i++) {
+					  std::tuple tuple = std::tie();						
+					  recursive_arg_function<Args ...>(action, tuple, component_data, i, 0, action_types_size);		
+				  }
+			  }
+
+			  //check all archetypes, for all components needed in the execute call
+			  //execute call on those
+
+		  }
+		  template <typename Component, typename ...Args,typename Action, typename Tuple>
+		  void recursive_arg_function (const Action _action, Tuple _tuple, std::vector<std::vector<char>> _component_data,int i, int j , std::vector<size_t> _action_types_size){
+			  auto tuple = std::tuple_cat(_tuple, std::tie(reinterpret_cast<Component&>(_component_data[j].data() + i * _action_types_size[j])));
+			  j++;
+			  if constexpr (sizeof...(Args) > 0) {
+				  recursive_arg_function<Args ...>(_action, tuple, _component_data, i, j, _action_types_size);
+			  }
+			  else {
+				  std::apply(_action, tuple);
+			  }
+		  }
+
 
 		  std::vector<Archetype> archetypes;
 		  std::vector<bool> flags;

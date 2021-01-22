@@ -11,6 +11,8 @@ struct Size {
 int main(int argc, char *argv[]) {
 	game::Registry registry;
 	Entity new_entity = registry.create();
-	Size& size = registry.addComponent<Size>(new_entity,3);
+	Size three = { 3 };
+	registry.addComponent<Size>(new_entity,three);
+	registry.erase(new_entity);
 	return EXIT_SUCCESS;
 }
