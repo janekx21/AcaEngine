@@ -191,7 +191,8 @@ namespace game {
 							  break;
 						  }
 					  }
-					  Component& component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[count_types].data.data() + sizeof(Component) * (archetypes[_ent.archetype].entities.size()-1));
+					  Component& component_reference;
+					  component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[count_types].data.data() + sizeof(Component) * (archetypes[_ent.archetype].entities.size()-1));
 					  return component_reference;
 				  }
 			  }
@@ -199,7 +200,7 @@ namespace game {
 			  //CASE3 Need to move entity to new archetype that doesn't exists yet
 
 			  std::vector <ComponentType> new_archetype_components;
-			  std::vector <Entity*> new_archetype_entities;
+			  std::vector <uint32_t> new_archetype_entities;
 			  Archetype new_archetype = { entity_types, new_archetype_components, new_archetype_entities};
 			  
 			  bool move_back = true;
@@ -230,7 +231,7 @@ namespace game {
 				  }
 			  }
 			  
-			  if (moved_back) {
+			  if (move_back) {
 				  archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
 				  
 			  }
@@ -253,8 +254,8 @@ namespace game {
 			  
 			  archetypes.push_back(new_archetype);
 			  _ent.archetype = archetypes.size() - 1;
-
-			  Component& component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[count_types].data.data());
+			  Component& component_reference;
+			  component_reference = reinterpret_cast<Component&>(archetypes[_ent.archetype].components[count_types].data.data());
 			  return component_reference;
 		  }
 		  // Remove a component from an existing entity.// Does not check whether it exists.
