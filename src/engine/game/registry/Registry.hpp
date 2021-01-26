@@ -561,7 +561,8 @@ namespace game {
 				  }
 				  for (int i = 0; i < a_archetypes_iterator.entities.size()-1; i++) {
 					  auto tuple = std::tie();
-					  executeHelper<Args...>(_action, tuple, component_data, action_types_size, i, 0);
+					  int s = 0; 
+					  executeHelper<Args...>(_action, tuple, component_data, action_types_size, i, s);
 							  
 					
 				  }
