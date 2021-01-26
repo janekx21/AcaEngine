@@ -61,7 +61,7 @@ namespace game {
 					  move_back = false;
 				  }
 				  else {
-					  char* copy_data_src = component_iterator.data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size()-1;
+					  char* copy_data_src = component_iterator.data.data() + temp_typeSize * (archetypes[_ent.archetype].entities.size()-1);
 					  char* copy_data_dst = component_iterator.data.data() + temp_typeSize * position;
 					  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
 					  component_iterator.data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size()-1));
@@ -269,7 +269,6 @@ namespace game {
 		  // Remove a component from an existing entity.// Does not check whether it exists.
 		  template<component_type Component>
 		  void removeComponent(Entity &_ent) {
-
 			  uint32_t position;
 			  for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
 				  if (archetypes[_ent.archetype].entities[i]== _ent.id) {
@@ -309,6 +308,7 @@ namespace game {
 					  }
 				  }
 				  if (archetype_exists) {				// move old data to existing archetype
+					  
 					  bool move_back = true;
 					  bool archetype_empty = false;
 					  for (int i = 0; i < entity_types.size(); i++) {
@@ -323,15 +323,15 @@ namespace game {
 								  
 								  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
 
-								  if (position == archetypes[_ent.archetype].entities.size()) {
+								  if (position == (archetypes[_ent.archetype].entities.size()-1)) {
 									  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
 									  move_back = false;
 								  }
 								  else {
 									  copy_data_dst = copy_data_src;
-									  copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size();
+									  copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * (archetypes[_ent.archetype].entities.size()-1);
 									  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-									  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
+									  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size()-1));
 
 								  }
 							  }
@@ -342,16 +342,15 @@ namespace game {
 						  archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
 					  }
 
-					  archetypes[_ent.archetype].entities.pop_back();
+					  archetypes[_ent.archetype].entities.pop_back(); //attention entitiesvector is now one entry smaller
 
 					  for (int j = 0; j < archetypes[_ent.archetype].types.size(); j++) {
 						  if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[j]) {
 							  size_t temp_typeSize = sizeof(Component);
 							  if (position == archetypes[_ent.archetype].entities.size()) {
-								 archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
+								 archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());							
 							  }
 							  else {
-
 								  char* copy_data_src = archetypes[_ent.archetype].components[j].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size();
 								  char* copy_data_dst = archetypes[_ent.archetype].components[j].data.data() + temp_typeSize * position;								 
 								  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
@@ -396,7 +395,7 @@ namespace game {
 				  }
 				  else {
 					  copy_data_dst = copy_data_src;
-					  copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size()-1;
+					  copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * (archetypes[_ent.archetype].entities.size()-1);
 					  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
 					  archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size()-1));
 				  }
@@ -410,7 +409,7 @@ namespace game {
 						  archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size()-1));
 					  }
 					  else {
-						  char* copy_data_src = archetypes[_ent.archetype].components[j].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size()-1;
+						  char* copy_data_src = archetypes[_ent.archetype].components[j].data.data() + temp_typeSize * (archetypes[_ent.archetype].entities.size()-1);
 						  char* copy_data_dst = archetypes[_ent.archetype].components[j].data.data() + temp_typeSize * position;
 						  memcpy(copy_data_dst, copy_data_src, temp_typeSize);
 						  archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size()-1));
@@ -527,8 +526,9 @@ namespace game {
 				  action_types.erase(action_types.begin());
 				  action_types_size.erase(action_types_size.begin());
 			  }
-
-			  for (auto& archetype_iterator : archetypes) {
+			  std::vector<uint32_t> archetype_ids;
+			  for (int u = 0; u < archetypes.size(); u++) {
+				  auto& archetype_iterator = archetypes[u];
 				  hasAllComponents = true;				  
 				
 				  for (auto& type_iterator : action_types) {
@@ -544,11 +544,13 @@ namespace game {
 				  }
 					
 				  if (hasAllComponents) {
-						action_archetypes.push_back(archetype_iterator);					
+						action_archetypes.push_back(archetype_iterator);
+						archetype_ids.push_back(u);
 				  }
 			  }
 
-			  for (auto& a_archetypes_iterator : action_archetypes) {
+			  for (int t = 0; t < action_archetypes.size(); t++) {
+				  auto& a_archetypes_iterator = action_archetypes[t];
 				  std::vector<std::vector<char>> component_data;
 				  for (int j = 0; j < action_types.size(); j++) {
 					  for (int i = 0; i < a_archetypes_iterator.types.size(); i++) {
@@ -562,11 +564,18 @@ namespace game {
 					  }
 				  }
 				  for (int i = 0; i < a_archetypes_iterator.entities.size(); i++) {
-					  auto tuple = std::tie();
+					  
 					  int s = 0; 
-					  executeHelper<Args...>(_action, tuple, component_data, action_types_size, i, s);
-							  
-					
+					  /*if (first_is_entity) {
+						  Entity entity_help = { a_archetypes_iterator.entities[i], archetype_ids[t] };
+						  auto tuple = std::tie(*reinterpret_cast<Entity*>(&entity_help));
+						  executeHelper<Args...>(_action, tuple, component_data, action_types_size, i, s);
+					  }
+					  else {
+					  */
+						  auto tuple = std::tie();
+						  executeHelper<Args...>(_action, tuple, component_data, action_types_size, i, s);
+					  //}
 				  }
 			  }
 
@@ -576,14 +585,23 @@ namespace game {
 		  }
 			
 		  template<component_type Component, typename ...Args, typename Action, typename Tuple>
-		  void executeHelper(Action& _action, Tuple &_tuple, std::vector<std::vector<char>> &_component_data, std::vector<size_t> &_action_types_size, int i, int &s) {
-			  auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component_data[s].data() + _action_types_size[s] * i)));			  
-			  if constexpr (sizeof ...(Args) > 0) {
-				  s++;
-				  executeHelper<Component, Args...>(_action, tuple, _component_data, _action_types_size, i, s);
+		  void executeHelper(Action& _action, Tuple& _tuple, std::vector<std::vector<char>>& _component_data, std::vector<size_t>& _action_types_size, int i, int& s) {
+			  std::cout << "Componenttype = " << typeid(Component).name() << "\n";
+			  if (typeid(Component).hash_code() == typeid(Entity).hash_code()) {
+				  if constexpr (sizeof ...(Args) > 0) {
+					  auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component_data[0].data() + _action_types_size[0] * i)));/*semantically useless, syntactically crucial*/
+					  executeHelper<Args...>(_action, tuple, _component_data, _action_types_size, i, s);
+				  }
 			  }
 			  else {
-				  std::apply(_action, tuple);
+				  auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component_data[s].data() + _action_types_size[s] * i)));
+				  if constexpr (sizeof ...(Args) > 0) {
+					  s++;
+					  executeHelper<Args...>(_action, tuple, _component_data, _action_types_size, i, s);
+				  }
+				  else {
+					  std::apply(_action, tuple);
+				  }
 			  }
 		  }
 		 

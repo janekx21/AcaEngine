@@ -86,4 +86,5 @@ int main()
 	{
 		EXPECT(registry.getComponentUnsafe<Bar>(entities[i]).f == -1.f, "Action can change components.");
 	}
+	std::cout << "RegsitryTest done!\n";
 }
