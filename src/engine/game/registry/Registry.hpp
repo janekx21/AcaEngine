@@ -83,6 +83,9 @@ namespace game {
 			  if (_ent.generation == generations[_ent.ent.id] && flags[_ent.ent.id]) {
 				  return _ent.ent;
 			  }
+			  else {
+				  return std::nullopt;
+			  }
 		  }
 
 
@@ -441,7 +444,7 @@ namespace game {
 			  }
 			  for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
 				  if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
-					  Component& component_reference = *reinterpret_cast<Component*>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
+					  Component* component_reference = reinterpret_cast<Component*>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
 					  return component_reference;
 				  }
 			  }
@@ -483,7 +486,6 @@ namespace game {
 					  return component_reference;
 				  }
 			  }
-			  return nullptr;
 		  }
 		  template<component_type Component>
 		  const Component& getComponentUnsafe(Entity _ent) const {
@@ -559,7 +561,7 @@ namespace game {
 						  }
 					  }
 				  }
-				  for (int i = 0; i < a_archetypes_iterator.entities.size()-1; i++) {
+				  for (int i = 0; i < a_archetypes_iterator.entities.size(); i++) {
 					  auto tuple = std::tie();
 					  int s = 0; 
 					  executeHelper<Args...>(_action, tuple, component_data, action_types_size, i, s);
@@ -575,7 +577,7 @@ namespace game {
 			
 		  template<component_type Component, typename ...Args, typename Action, typename Tuple>
 		  void executeHelper(Action& _action, Tuple &_tuple, std::vector<std::vector<char>> &_component_data, std::vector<size_t> &_action_types_size, int i, int &s) {
-			  auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component_data[s].data() + _action_types_size[s] * i)));
+			  auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component_data[s].data() + _action_types_size[s] * i)));			  
 			  if constexpr (sizeof ...(Args) > 0) {
 				  s++;
 				  executeHelper<Component, Args...>(_action, tuple, _component_data, _action_types_size, i, s);
