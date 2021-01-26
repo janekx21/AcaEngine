@@ -575,13 +575,13 @@ namespace game {
 			
 		  template<component_type Component, typename ...Args, typename Action, typename Tuple>
 		  void executeHelper(Action& _action, Tuple &_tuple, std::vector<std::vector<char>> &_component_data, std::vector<size_t> &_action_types_size, int i, int &s) {
+			  auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component_data[s].data() + _action_types_size[s] * i)));
 			  if constexpr (sizeof ...(Args) > 0) {
-				  auto tuple = std::tuple_cat(tuple, reinterpret_cast<Component*>(_component_data[s].data() + _action_types_size[s] * i));
 				  s++;
 				  executeHelper<Component, Args...>(_action, tuple, _component_data, _action_types_size, i, s);
 			  }
 			  else {
-				  std::apply(_action, _tuple);
+				  std::apply(_action, tuple);
 			  }
 		  }
 		 
