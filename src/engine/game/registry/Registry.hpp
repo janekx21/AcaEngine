@@ -561,10 +561,9 @@ namespace game {
 				  }
 				  for (int i = 0; i < a_archetypes_iterator.entities.size()-1; i++) {
 					  auto tuple = std::tie();
-					  for (int s = 0; s < action_types.size(); s++) {						  
-							  tuple = std::tuple_cat(tuple, *reinterpret_cast<decltype(std::get<s>(std::declval<allComponents>()))*>(component_data[s].data() + action_types_size[s] * i));
-						}
-					  std::apply(_action, tuple);
+					  executeHelper<Args...>(_action, tuple, component_data, action_types_size, i, 0);
+							  
+					
 				  }
 			  }
 
@@ -572,7 +571,18 @@ namespace game {
 			  //execute call on those
 
 		  }
-		
+			
+		  template<component_type Component, typename ...Args, typename Action, typename Tuple>
+		  void executeHelper(Action& _action, Tuple _tuple, std::vector<std::vector<char>> _component_data, std::vector<size_t> _action_types_size, int i, int s) {
+			  if constexpr (sizeof ...(Args) > 0) {
+				  auto tuple = std::tuple_cat(tuple, reinterpret_cast<Component*>(_component_data[s].data() + _action_types_size[s] * i));
+				  s++;
+				  executeHelper<Component, Args...>(_action, tuple, _component_data, _action_types_size, i, s);
+			  }
+			  else {
+				  std::apply(_action, _tuple);
+			  }
+		  }
 		 
 
 
