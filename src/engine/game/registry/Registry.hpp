@@ -520,7 +520,7 @@ namespace game {
 			std::vector<std::size_t> action_types_size;
 			(action_types.push_back(typeid(Args).hash_code()), ...);
 			(action_types_size.push_back(sizeof(Args)), ...);
-			std::vector<Archetype> action_archetypes; //copy! please refernce pointer
+			
 
 			if (*action_types.begin() == typeid(Entity).hash_code()) {
 				first_is_entity = true;
