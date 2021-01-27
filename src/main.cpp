@@ -92,7 +92,6 @@ int main()
 	//registry.execute([&sum](const Bar& bar, const Foo& foo) { sum += foo.i - 2 * static_cast<int>(bar.f); });
 	registry.execute<Bar, Foo>([&sum](const Bar& bar, const Foo& foo) { sum += foo.i - 2 * static_cast<int>(bar.f); });
 	EXPECT(sum == -3 - 6 - 9, "Execute action on multiple component types.");
-	std::cout << "last exec\n";
 	registry.execute<Entity, Bar>([&](Entity ent, Bar& bar)
 		//registry.execute([&](Entity ent, Bar& bar)
 		{
