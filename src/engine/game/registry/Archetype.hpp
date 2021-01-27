@@ -4,5 +4,5 @@
 struct Archetype {
 	std::vector < size_t > types;
 	std::vector < ComponentType > components;
-	std::vector < uint32_t > entities;
+	std::vector < uint32_t > entities; // hashmap better maybe
 };

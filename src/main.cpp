@@ -67,17 +67,9 @@ int main()
 		EXPECT(registry.getComponent<Foo>(entities[i]), "Retrieve a component.");
 		EXPECT(registry.getComponentUnsafe<Foo>(entities[i]).i == i, "Retrieve a component.");
 	}
-	for (int i = 2; i < static_cast<int>(entities.size()); ++i)
-	{
-		std::cout << "registry.getComponentUnsafe<Foo>(entities[i]).i = " << registry.getComponentUnsafe<Foo>(entities[i]).i << "\n";
-	}
+	
 	registry.removeComponent<Foo>(entities[0]);
 	registry.removeComponent<Foo>(entities[1]);
-
-	for (int i = 2; i < static_cast<int>(entities.size()); ++i)
-	{
-		std::cout << "registry.getComponentUnsafe<Foo>(entities[i]).i = " << registry.getComponentUnsafe<Foo>(entities[i]).i << "\n";
-	}
 
 	EXPECT(!registry.getComponent<Foo>(entities[0]), "Remove a component.");
 	EXPECT(!registry.getComponent<Foo>(entities[1]), "Remove a component.");
