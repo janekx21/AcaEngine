@@ -520,8 +520,7 @@ namespace game {
 			std::vector<std::size_t> action_types_size;
 			(action_types.push_back(typeid(Args).hash_code()), ...);
 			(action_types_size.push_back(sizeof(Args)), ...);
-			std::vector<Archetype> action_archetypes; //copy! please refernce pointer
-
+			
 			if (*action_types.begin() == typeid(Entity).hash_code()) {
 				first_is_entity = true;
 				action_types.erase(action_types.begin());
@@ -531,56 +530,47 @@ namespace game {
 			for (int u = 0; u < archetypes.size(); u++) {
 				auto& archetype_iterator = archetypes[u];
 				hasAllComponents = true;
-
-				for (auto& type_iterator : action_types) {
-					bool contains_type = false;
-					for (auto& archetype_type_iterator : archetype_iterator.types) {
-						if (archetype_type_iterator == type_iterator) {//execute here
-							contains_type = true;
+				std::vector<uint32_t> component_flags;
+				for (int j = 0; j < action_types.size(); j++) {					
+					auto& type_iterator = action_types[j];
+					bool component_type_exists = false;					
+					for (int i = 0; i < archetype_iterator.types.size(); i++) {
+						auto& archetype_type_iterator = archetype_iterator.types[i];
+						if (archetype_type_iterator == type_iterator) {							
+							component_type_exists = true;
+						}
+						if (component_type_exists) {
+							component_flags.push_back(i);
 						}
 					}
-					if (!contains_type) {
+					
+					if (!component_type_exists) {
 						hasAllComponents = false;
 					}
 				}
 
-				if (hasAllComponents) {
-					action_archetypes.push_back(archetype_iterator);
-					archetype_ids.push_back(u);
-				}
-			}
+				if (hasAllComponents) {					
+					
+					//execute
+					for (int i = 0; i < archetype_iterator.entities.size(); i++) {
 
-			for (int t = 0; t < action_archetypes.size(); t++) {
-				auto& a_archetypes_iterator = action_archetypes[t];
-				std::vector<std::vector<char>> component_data;
-				for (int j = 0; j < action_types.size(); j++) {
-					for (int i = 0; i < a_archetypes_iterator.types.size(); i++) {
-						if (a_archetypes_iterator.types[i] == action_types[j]) {
-							size_t temp_size = (a_archetypes_iterator.components[i].typeSize * a_archetypes_iterator.entities.size());
-							std::vector<char> copy_data_dst;
-							copy_data_dst.resize(temp_size);
-							component_data.push_back(copy_data_dst);
-							memcpy(component_data[j].data(), a_archetypes_iterator.components[i].data.data(), temp_size);
+						int s = 0;
+						
+						Entity entity_help = { archetype_iterator.entities[i], u };
+						auto tuple = std::tie();
+						if constexpr (std::is_same_v<std::tuple_element_t<0, std::tuple<Args...>>, Entity>) {
+							executeHelper_Entity<Args...>(_action, tuple, archetype_iterator.components, component_flags, i, s, entity_help);
 						}
+						else {
+							executeHelper<Args...>(_action, tuple, archetype_iterator.components, component_flags, i, s);
+						}
+
 					}
-				}
-				for (int i = 0; i < a_archetypes_iterator.entities.size(); i++) {
-
-					int s = 0;
-					Entity entity_help = { a_archetypes_iterator.entities[i], archetype_ids[t] };
-					auto tuple = std::tie();
-					if constexpr (std::is_same_v<std::tuple_element_t<0, std::tuple<Args...>>, Entity>) {
-						executeHelper_Entity<Args...>(_action, tuple, component_data, action_types_size, i, s, entity_help);
-					}
-					else {
-						executeHelper<Args...>(_action, tuple, component_data, action_types_size, i, s);
-					}
-
-
-
 
 				}
 			}
+
+
 
 			//check all archetypes, for all components needed in the execute call
 			//execute call on those
@@ -589,11 +579,12 @@ namespace game {
 
 
 		template<component_type Component, typename ...Args, typename Action, typename Tuple>
-		void executeHelper(Action& _action, Tuple& _tuple, std::vector<std::vector<char>>& _component_data, std::vector<size_t>& _action_types_size, int i, int& s) {
-			auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component_data[s].data() + _action_types_size[s] * i)));
-			if constexpr (sizeof ...(Args) > 0) {
-				s++;
-				executeHelper<Args...>(_action, tuple, _component_data, _action_types_size, i, s);
+		void executeHelper(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t>& _component_flags, int i, int& s) {
+		
+			auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component[_component_flags[s]].data.data() + _component[s].typeSize * i)));
+			if constexpr (sizeof ...(Args) > 0) {				
+					s++;
+				executeHelper<Args...>(_action, tuple, _component, _component_flags, i, s);
 			}
 			else {
 				std::apply(_action, tuple);
@@ -601,9 +592,9 @@ namespace game {
 		}
 
 		template<component_type Component, typename ...Args, typename Action, typename Tuple>
-		void executeHelper_Entity(Action& _action, Tuple& _tuple, std::vector<std::vector<char>>& _component_data, std::vector<size_t>& _action_types_size, int i, int& s, Entity _entity) {
+		void executeHelper_Entity(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t> _component_flags, int i, int& s, Entity _entity) {
 			auto tuple = std::make_tuple(_entity);
-			executeHelper<Args...>(_action, tuple, _component_data, _action_types_size, i, s);
+			executeHelper<Args...>(_action, tuple, _component, _component_flags, i, s);
 		}
 
 
