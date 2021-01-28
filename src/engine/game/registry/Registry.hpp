@@ -20,6 +20,10 @@ namespace game {
 			archetypes.push_back(emptyArchetype);
 		}
 
+		/**
+		 * Creates entity and places it inside the empty archetype
+		 * @return the created entity
+		 */
 		Entity create() {
 			auto id = generateId();
 			Entity entity = {id, EMPTY_ARCHETYPE_INDEX};
@@ -27,6 +31,10 @@ namespace game {
 			return entity;
 		};
 
+		/**
+		 * Removes entity from its archetype and erases its component data
+		 * @param _ent entity to remove
+		 */
 		void erase(Entity _ent) {
 			flags[_ent.id] = false;
 			uint32_t position = getPositionInArchetype(_ent);
@@ -67,10 +75,16 @@ namespace game {
 			}
 		}
 
-
-		// Add a new component to an existing entity. No changes are done if Component
-		// if_ent already has a component of this type.
-		// @return A reference to the new component or the already existing component.
+		/**
+		 * Add a new component to an existing entity. No changes are done if Component
+		 * if _ent already has a component of this type.
+		 *
+		 * @tparam Component
+		 * @tparam Args
+		 * @param _ent
+		 * @param _args
+		 * @return A reference to the new component or the already existing component.
+		 */
 		template<component_concept Component, typename... Args>
 		Component &addComponent(Entity &_ent, Args &&..._args) {
 			uint32_t position = getPositionInArchetype(_ent);
@@ -79,112 +93,95 @@ namespace game {
 			//CASE1 Does entities archetype contain component already?
 			auto index = findIndexInOwnTypes<Component>(_ent);
 			if (index != -1) {
-				auto* data = archetypes[_ent.archetype].components[index].data.data();
+				auto *data = archetypes[_ent.archetype].components[index].data.data();
 				return *reinterpret_cast<Component *>(data + sizeof(Component) * position);
 			}
 
 			auto typesCount = 0;
 
-
 			////////////////////////////////////////////////////////////////
 			//CASE2 Need to move entity to new archetype that exists already
 			generations[_ent.id] += 1;
 
-			std::vector<size_t> entity_types;
-			for (auto &it_types : archetypes[_ent.archetype].types) {
-				entity_types.push_back(it_types);
-			}
+			auto entityTypes = archetypes[_ent.archetype].types;
+			entityTypes.push_back(typeid(Component).hash_code());
 
-			entity_types.push_back(typeid(Component).hash_code());
-			//std::cout << "entity_types.size() = " << entity_types.size() << "\n";
-			//TODO: check wether archetype exists
 			for (int k = 0; k < archetypes.size(); k++) {
-				auto &it_archetypes = archetypes[k];
-				//std::cout << "it_archetypes.types.size() = " << it_archetypes.types.size() << "\n";
-				if (entity_types.size() != it_archetypes.types.size()) {
-					continue;
-				}
-				bool archetype_exists = true;
-				for (auto &it_types_entity : entity_types) {//hash sortieren und summieren (collision hashmap)
-					bool type_exists = false;
-					for (auto &it_types_archetype : it_archetypes.types) {
-						if (it_types_archetype == it_types_entity) {
-							type_exists = true;
-							break;
+				auto &archetype = archetypes[k];
+
+				// TODO hash sortieren und summieren (collision hashmap)
+				auto sameSize = entityTypes.size() == archetype.types.size();
+				if (!sameSize) continue;
+
+				bool sameTypes = isSubSet(entityTypes, archetype.types);
+				if (!sameTypes) continue;
+
+				bool move_back = true;
+				bool archetype_empty = false;
+				auto& oldArchetype = archetypes[_ent.archetype];
+
+				for (int i = 0; i < oldArchetype.types.size(); i++) {
+					for (int j = 0; j < archetype.types.size(); j++) {
+						if (entityTypes[i] == archetype.types[j]) {
+							size_t temp_typeSize = archetype.components[j].typeSize;
+							//resize
+
+							archetype.components[j].data.resize(temp_typeSize * (archetype.entities.size() + 1));
+							//set src/dst
+							char *copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * position;
+							char *copy_data_dst = archetype.components[j].data.data() + temp_typeSize * archetype.entities.size();
+							//copy
+							memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+
+							if (position == archetypes[_ent.archetype].entities.size()) {
+								archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
+								move_back = false;
+							} else {
+								copy_data_dst = copy_data_src;
+								copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size();
+								memcpy(copy_data_dst, copy_data_src, temp_typeSize);
+								archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
+							}
 						}
 					}
-					if (!type_exists) {
-						archetype_exists = false;
+				}
+
+				if (move_back) {
+					archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
+				}
+
+				archetypes[_ent.archetype].entities.pop_back();
+
+				for (int j = 0; j < archetype.types.size(); j++) {
+					if (typeid(Component).hash_code() == archetype.types[j]) {
+						size_t temp_typeSize = archetype.components[j].typeSize;
+						typesCount = j;
+						archetype.components[j].data.resize(temp_typeSize * (archetype.entities.size() + 1));
+
+						Component copy_data_src = Component(_args...);
+						char *copy_data_dst = archetype.components[j].data.data() + temp_typeSize * archetype.entities.size();
+						memcpy(copy_data_dst, &copy_data_src, temp_typeSize);
 						break;
 					}
 				}
 
-				if (archetype_exists) {// move old data to existing archetype
-					bool move_back = true;
-					bool archetype_empty = false;
-					for (int i = 0; i < entity_types.size() - 1; i++) {
-						for (int j = 0; j < it_archetypes.types.size(); j++) {
-							if (entity_types[i] == it_archetypes.types[j]) {
-								size_t temp_typeSize = it_archetypes.components[j].typeSize;
-								//resize
+				archetype.entities.push_back(_ent.id);
 
-								it_archetypes.components[j].data.resize(temp_typeSize * (it_archetypes.entities.size() + 1));
-								//set src/dst
-								char *copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * position;
-								char *copy_data_dst = it_archetypes.components[j].data.data() + temp_typeSize * it_archetypes.entities.size();
-								//copy
-								memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-
-								if (position == archetypes[_ent.archetype].entities.size()) {
-									archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
-									move_back = false;
-								} else {
-									copy_data_dst = copy_data_src;
-									copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * archetypes[_ent.archetype].entities.size();
-									memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-									archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * archetypes[_ent.archetype].entities.size());
-								}
-							}
-						}
-					}
-
-					if (move_back) {
-						archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
-					}
-
-					archetypes[_ent.archetype].entities.pop_back();
-
-					for (int j = 0; j < it_archetypes.types.size(); j++) {
-						if (typeid(Component).hash_code() == it_archetypes.types[j]) {
-							size_t temp_typeSize = it_archetypes.components[j].typeSize;
-							typesCount = j;
-							it_archetypes.components[j].data.resize(temp_typeSize * (it_archetypes.entities.size() + 1));
-
-							Component copy_data_src = Component(_args...);
-							char *copy_data_dst = it_archetypes.components[j].data.data() + temp_typeSize * it_archetypes.entities.size();
-							memcpy(copy_data_dst, &copy_data_src, temp_typeSize);
-							break;
-						}
-					}
-
-					it_archetypes.entities.push_back(_ent.id);
-
-					_ent.archetype = k;
-					Component &component_reference = *reinterpret_cast<Component *>(archetypes[_ent.archetype].components[typesCount].data.data() + sizeof(Component) * (archetypes[_ent.archetype].entities.size() - 1));
-					return component_reference;
-				}
+				_ent.archetype = k;
+				Component &component_reference = *reinterpret_cast<Component *>(archetypes[_ent.archetype].components[typesCount].data.data() + sizeof(Component) * (archetypes[_ent.archetype].entities.size() - 1));
+				return component_reference;
 			}
 			////////////////////////////////////////////////////////////////////
 			//CASE3 Need to move entity to new archetype that doesn't exists yet
 
 			std::vector<ComponentType> new_archetype_components;
 			std::vector<uint32_t> new_archetype_entities;
-			Archetype new_archetype = {entity_types, new_archetype_components, new_archetype_entities};// copy?
+			Archetype new_archetype = {entityTypes, new_archetype_components, new_archetype_entities};// copy?
 
 			bool move_back = true;
 			bool archetype_empty = false;
 
-			for (int i = 0; i < entity_types.size() - 1 /*gefährlich*/; i++) {
+			for (int i = 0; i < entityTypes.size() - 1 /*gefährlich*/; i++) {
 				size_t temp_typeSize = archetypes[_ent.archetype].components[i].typeSize;
 				std::vector<char> new_data;
 				new_data.resize(temp_typeSize);
@@ -574,7 +571,7 @@ namespace game {
 			throw std::runtime_error("unreachable code");
 		}
 
-		template <component_concept Component>
+		template<component_concept Component>
 		int findIndexInOwnTypes(Entity _ent) {
 			int index = 0;
 			for (auto &typeHash : archetypes[_ent.archetype].types) {
@@ -584,6 +581,24 @@ namespace game {
 				index++;
 			}
 			return -1;
+		}
+
+		bool isSubSet(std::vector<size_t> &types, std::vector<size_t> &otherTypes) const {
+			bool archetype_exists = true;
+			for (auto &type : types) {
+				bool type_exists = false;
+				for (auto &otherType : otherTypes) {
+					if (otherType == type) {
+						type_exists = true;
+						break;
+					}
+				}
+				if (!type_exists) {
+					archetype_exists = false;
+					break;
+				}
+			}
+			return archetype_exists;
 		}
 	};
 }// namespace game
