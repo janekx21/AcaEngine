@@ -102,6 +102,7 @@ int main()
 	for (size_t i = 3; i < entities.size(); i += 3)
 	{
 		EXPECT(registry.getComponentUnsafe<Bar>(entities[i]).f == -1.f, "Action can change components.");
+
 	}
 	std::cout << "RegsitryTest done!\n";
 }
