@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <iostream>
 #include <optional>
 #include <vector>
@@ -214,7 +214,7 @@ namespace game {
 			bool move_back = true;
 			bool archetype_empty = false;
 
-			for (int i = 0; i < entity_types.size() - 1/*gef�hrlich*/; i++) {
+			for (int i = 0; i < entity_types.size() - 1/*gefährlich*/; i++) {
 				size_t temp_typeSize = archetypes[_ent.archetype].components[i].typeSize;
 				std::vector<char> new_data;
 				new_data.resize(temp_typeSize);
