@@ -30,27 +30,29 @@ namespace game {
 
 		void erase(Entity _ent) {
 			flags[_ent.id] = false;
-			//TODO:erase components
 			uint32_t position = getPositionInArchetype(_ent);
 
-			bool move_back = true;
-			for (auto &component_iterator : archetypes[_ent.archetype].components) {
-				size_t temp_typeSize = component_iterator.typeSize;
-				if (position == archetypes[_ent.archetype].entities.size() - 1) {
-					component_iterator.data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1));
-					move_back = false;
+			bool shift = true;
+			auto& ownArchetype = archetypes[_ent.archetype];
+			for (auto &component : ownArchetype.components) {
+				size_t size = component.typeSize;
+				bool isLast = position == ownArchetype.entities.size() - 1;
+				if (isLast) {
+					shift = false;
 				} else {
-					char *copy_data_src = component_iterator.data.data() + temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1);
-					char *copy_data_dst = component_iterator.data.data() + temp_typeSize * position;
-					memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-					component_iterator.data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1));
+					char *copy_data_src = component.data.data() + size * (ownArchetype.entities.size() - 1);
+					char *copy_data_dst = component.data.data() + size * position;
+					memcpy(copy_data_dst, copy_data_src, size);
 				}
+				component.data.resize(size * (ownArchetype.entities.size() - 1));
 			}
 
-			if (move_back) {
-				archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
+			if (shift) {
+				// move last entity to free space
+				ownArchetype.entities[position] = ownArchetype.entities.back();
 			}
-			archetypes[_ent.archetype].entities.pop_back();
+
+			ownArchetype.entities.pop_back();
 		}
 
 		EntityRef getRef(Entity _ent) const {
