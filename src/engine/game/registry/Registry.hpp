@@ -77,15 +77,13 @@ namespace game {
 
 			//////////////////////////////////////////////////////////
 			//CASE1 Does entities archetype contain component already?
-			int index = 0;
-			for (auto &typeHash : archetypes[_ent.archetype].types) {
-				if (typeHash == typeid(Component).hash_code()) {
-					auto* data = archetypes[_ent.archetype].components[index].data.data();
-					return *reinterpret_cast<Component *>(data + sizeof(Component) * position);
-				}
-				index++;
+			auto index = findIndexInOwnTypes<Component>(_ent);
+			if (index != -1) {
+				auto* data = archetypes[_ent.archetype].components[index].data.data();
+				return *reinterpret_cast<Component *>(data + sizeof(Component) * position);
 			}
-			auto typesCount = index;
+
+			auto typesCount = 0;
 
 
 			////////////////////////////////////////////////////////////////
@@ -574,6 +572,18 @@ namespace game {
 				}
 			}
 			throw std::runtime_error("unreachable code");
+		}
+
+		template <component_concept Component>
+		int findIndexInOwnTypes(Entity _ent) {
+			int index = 0;
+			for (auto &typeHash : archetypes[_ent.archetype].types) {
+				if (typeHash == typeid(Component).hash_code()) {
+					return index;
+				}
+				index++;
+			}
+			return -1;
 		}
 	};
 }// namespace game
