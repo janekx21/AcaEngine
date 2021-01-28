@@ -46,13 +46,8 @@ namespace game {
 		void erase(Entity _ent) {
 			flags[_ent.id] = 0;
 			//TODO:erase components
-			uint32_t position;
-			for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
-				if (archetypes[_ent.archetype].entities[i] == _ent.id) {
-					position = i;
-					break;
-				}
-			}
+			uint32_t position = getPositionInArchetype(_ent);
+			
 			bool move_back = true;
 			for (auto& component_iterator : archetypes[_ent.archetype].components) {
 				size_t temp_typeSize = component_iterator.typeSize;
@@ -87,14 +82,7 @@ namespace game {
 				return std::nullopt;
 			}
 		}
-
-
-
-		// Add a new component to an existing entity. No changes are done if Component
-		// if_ent already has a component of this type.
-		// @return A reference to the new component or the already existing component.
-		template<component_type Component, typename... Args>
-		Component& addComponent(Entity& _ent, Args&&... _args) {
+		uint32_t getPositionInArchetype(Entity& _ent) {
 			uint32_t position;
 			for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
 				if (archetypes[_ent.archetype].entities[i] == _ent.id) {
@@ -102,6 +90,17 @@ namespace game {
 					break;
 				}
 			}
+			return position;
+		}
+
+
+		// Add a new component to an existing entity. No changes are done if Component
+		// if_ent already has a component of this type.
+		// @return A reference to the new component or the already existing component.
+		template<component_type Component, typename... Args>
+		Component& addComponent(Entity& _ent, Args&&... _args) {
+			uint32_t position = getPositionInArchetype(_ent);
+			
 			//////////////////////////////////////////////////////////
 			//CASE1 Does entities archetype contain component already?
 			int count_types = 0;
@@ -269,13 +268,8 @@ namespace game {
 		// Remove a component from an existing entity.// Does not check whether it exists.
 		template<component_type Component>
 		void removeComponent(Entity& _ent) {
-			uint32_t position;
-			for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
-				if (archetypes[_ent.archetype].entities[i] == _ent.id) {
-					position = i;
-					break;
-				}
-			}
+			uint32_t position = getPositionInArchetype(_ent);
+			
 			int pos_of_del_comp = 0;
 			std::vector<size_t> entity_types;
 			for (int a = 0; a < archetypes[_ent.archetype].types.size(); a++) {
@@ -434,13 +428,8 @@ namespace game {
 		// @return The component or nullptr if the entity has no such component.
 		template<component_type Component>
 		Component* getComponent(Entity _ent) {
-			uint32_t position;
-			for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
-				if (archetypes[_ent.archetype].entities[i] == _ent.id) {
-					position = i;
-					break;
-				}
-			}
+			uint32_t position = getPositionInArchetype(_ent);
+			
 			for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
 				if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
 					Component* component_reference = reinterpret_cast<Component*>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
@@ -453,13 +442,7 @@ namespace game {
 
 		template<component_type Component>
 		const Component* getComponent(Entity _ent) const {
-			uint32_t position;
-			for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
-				if (archetypes[_ent.archetype].entities[i] == _ent.id) {
-					position = i;
-					break;
-				}
-			}
+			uint32_t position = getPositionInArchetype(_ent);
 			for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
 				if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
 					Component& component_reference = *reinterpret_cast<Component*>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
@@ -472,13 +455,7 @@ namespace game {
 		// Does not check whether it exits.
 		template<component_type Component>
 		Component& getComponentUnsafe(Entity _ent) {
-			uint32_t position;
-			for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
-				if (archetypes[_ent.archetype].entities[i] == _ent.id) {
-					position = i;
-					break;
-				}
-			}
+			uint32_t position = getPositionInArchetype(_ent);
 			for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
 				if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
 					Component& component_reference = *reinterpret_cast<Component*>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
@@ -488,13 +465,7 @@ namespace game {
 		}
 		template<component_type Component>
 		const Component& getComponentUnsafe(Entity _ent) const {
-			uint32_t position;
-			for (int i = 0; i < archetypes[_ent.archetype].entities.size(); i++) {
-				if (archetypes[_ent.archetype].entities[i] == _ent.id) {
-					position = i;
-					break;
-				}
-			}
+			uint32_t position = getPositionInArchetype(_ent);
 			for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
 				if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
 					Component& component_reference = *reinterpret_cast<Component*>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
