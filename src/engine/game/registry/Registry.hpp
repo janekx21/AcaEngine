@@ -11,11 +11,10 @@
 
 namespace game {
 	template<typename T>
-	concept component_type = std::movable<T>;
+	concept component_concept = std::movable<T>;
 	static const int EMPTY_ARCHETYPE_INDEX = 0;
 	class Registry {
 	public:
-
 		Registry() {
 			Archetype emptyArchetype = {std::vector<size_t>(), std::vector<ComponentType>(), std::vector<uint32_t>()};
 			archetypes.push_back(emptyArchetype);
@@ -33,13 +32,14 @@ namespace game {
 			uint32_t position = getPositionInArchetype(_ent);
 
 			bool shift = true;
-			auto& ownArchetype = archetypes[_ent.archetype];
+			auto &ownArchetype = archetypes[_ent.archetype];
 			for (auto &component : ownArchetype.components) {
 				size_t size = component.typeSize;
 				bool isLast = position == ownArchetype.entities.size() - 1;
 				if (isLast) {
 					shift = false;
 				} else {
+					// copy last element to my position
 					char *copy_data_src = component.data.data() + size * (ownArchetype.entities.size() - 1);
 					char *copy_data_dst = component.data.data() + size * position;
 					memcpy(copy_data_dst, copy_data_src, size);
@@ -71,21 +71,22 @@ namespace game {
 		// Add a new component to an existing entity. No changes are done if Component
 		// if_ent already has a component of this type.
 		// @return A reference to the new component or the already existing component.
-		template<component_type Component, typename... Args>
+		template<component_concept Component, typename... Args>
 		Component &addComponent(Entity &_ent, Args &&..._args) {
 			uint32_t position = getPositionInArchetype(_ent);
 
 			//////////////////////////////////////////////////////////
 			//CASE1 Does entities archetype contain component already?
-			int count_types = 0;
-			for (auto &it_types : archetypes[_ent.archetype].types) {
-				if (it_types == typeid(Component).hash_code()) {
-
-					Component &component_reference = *reinterpret_cast<Component *>(archetypes[_ent.archetype].components[count_types].data.data() + sizeof(Component) * position);
-					return component_reference;
+			int index = 0;
+			for (auto &typeHash : archetypes[_ent.archetype].types) {
+				if (typeHash == typeid(Component).hash_code()) {
+					auto* data = archetypes[_ent.archetype].components[index].data.data();
+					return *reinterpret_cast<Component *>(data + sizeof(Component) * position);
 				}
-				count_types++;
+				index++;
 			}
+			auto typesCount = index;
+
 
 			////////////////////////////////////////////////////////////////
 			//CASE2 Need to move entity to new archetype that exists already
@@ -158,7 +159,7 @@ namespace game {
 					for (int j = 0; j < it_archetypes.types.size(); j++) {
 						if (typeid(Component).hash_code() == it_archetypes.types[j]) {
 							size_t temp_typeSize = it_archetypes.components[j].typeSize;
-							count_types = j;
+							typesCount = j;
 							it_archetypes.components[j].data.resize(temp_typeSize * (it_archetypes.entities.size() + 1));
 
 							Component copy_data_src = Component(_args...);
@@ -171,7 +172,7 @@ namespace game {
 					it_archetypes.entities.push_back(_ent.id);
 
 					_ent.archetype = k;
-					Component &component_reference = *reinterpret_cast<Component *>(archetypes[_ent.archetype].components[count_types].data.data() + sizeof(Component) * (archetypes[_ent.archetype].entities.size() - 1));
+					Component &component_reference = *reinterpret_cast<Component *>(archetypes[_ent.archetype].components[typesCount].data.data() + sizeof(Component) * (archetypes[_ent.archetype].entities.size() - 1));
 					return component_reference;
 				}
 			}
@@ -232,11 +233,11 @@ namespace game {
 
 			_ent.archetype = archetypes.size() - 1;
 
-			Component &component_reference = *reinterpret_cast<Component *>(archetypes[_ent.archetype].components[count_types].data.data());
+			Component &component_reference = *reinterpret_cast<Component *>(archetypes[_ent.archetype].components[typesCount].data.data());
 			return component_reference;
 		}
 		// Remove a component from an existing entity.// Does not check whether it exists.
-		template<component_type Component>
+		template<component_concept Component>
 		void removeComponent(Entity &_ent) {
 			uint32_t position = getPositionInArchetype(_ent);
 
@@ -389,7 +390,7 @@ namespace game {
 		}
 		// Retrieve a component associated with an entity.
 		// @return The component or nullptr if the entity has no such component.
-		template<component_type Component>
+		template<component_concept Component>
 		Component *getComponent(Entity _ent) {
 			uint32_t position = getPositionInArchetype(_ent);
 
@@ -403,7 +404,7 @@ namespace game {
 		}
 
 
-		template<component_type Component>
+		template<component_concept Component>
 		const Component *getComponent(Entity _ent) const {
 			uint32_t position = getPositionInArchetype(_ent);
 			for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
@@ -416,7 +417,7 @@ namespace game {
 		}
 		// Retrieve a component associated with an entity.
 		// Does not check whether it exits.
-		template<component_type Component>
+		template<component_concept Component>
 		Component &getComponentUnsafe(Entity _ent) {
 			uint32_t position = getPositionInArchetype(_ent);
 			for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
@@ -426,7 +427,7 @@ namespace game {
 				}
 			}
 		}
-		template<component_type Component>
+		template<component_concept Component>
 		const Component &getComponentUnsafe(Entity _ent) const {
 			uint32_t position = getPositionInArchetype(_ent);
 			for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
@@ -505,7 +506,7 @@ namespace game {
 		}
 
 
-		template<component_type Component, typename... Args, typename Action, typename Tuple>
+		template<component_concept Component, typename... Args, typename Action, typename Tuple>
 		void executeHelper(Action &_action, Tuple &_tuple, std::vector<ComponentType> &_component, std::vector<uint32_t> &_component_flags, int i, int &s) {
 
 			auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component *>(_component[_component_flags[s]].data.data() + _component[s].typeSize * i)));
@@ -517,7 +518,7 @@ namespace game {
 			}
 		}
 
-		template<component_type Component, typename... Args, typename Action, typename Tuple>
+		template<component_concept Component, typename... Args, typename Action, typename Tuple>
 		void executeHelper_Entity(Action &_action, Tuple &_tuple, std::vector<ComponentType> &_component, std::vector<uint32_t> _component_flags, int i, int &s, Entity _entity) {
 			auto tuple = std::make_tuple(_entity);
 			executeHelper<Args...>(_action, tuple, _component, _component_flags, i, s);
@@ -561,12 +562,12 @@ namespace game {
 			return -1;
 		}
 
-		Archetype& getEmptyArchetype() {
+		Archetype &getEmptyArchetype() {
 			return archetypes[0];
 		}
 
 		uint32_t getPositionInArchetype(Entity &entity) const {
-			auto& archetype = archetypes[entity.archetype];
+			auto &archetype = archetypes[entity.archetype];
 			for (int i = 0; i < archetype.entities.size(); i++) {
 				if (archetype.entities[i] == entity.id) {
 					return i;
