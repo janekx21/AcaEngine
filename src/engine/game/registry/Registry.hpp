@@ -86,7 +86,7 @@ namespace game {
 
 			auto& oldArchetype = archetypes[_ent.archetype];
 
-			auto entityTypes = archetypes[_ent.archetype].types;
+			auto entityTypes = oldArchetype.types;
 			entityTypes.push_back(typeid(Component).hash_code());
 
 			for (int k = 0; k < archetypes.size(); k++) {
@@ -102,6 +102,7 @@ namespace game {
 				bool move_back = true;
 				bool archetype_empty = false;
 				
+
 
 				for (int i = 0; i < oldArchetype.types.size(); i++) {
 					for (int j = 0; j < archetype.types.size(); j++) {
@@ -157,6 +158,8 @@ namespace game {
 			uint32_t archetype_position = archetypes.size();
 			archetypes.push_back(new_archetype);
 
+			auto& oldArchetype2 = archetypes[_ent.archetype];
+
 			bool move_back = true;
 			bool archetype_empty = false;
 
@@ -165,23 +168,17 @@ namespace game {
 				std::vector<char> new_data;
 				ComponentType new_type = { new_data, temp_typeSize };
 				archetypes[archetype_position].components.push_back(new_type);
-				archetypes[archetype_position].components[i].data.resize(temp_typeSize);
+				resizeComponent(archetypes[archetype_position].components[i], 1);
+				copyComponent(oldArchetype2.components[i], archetypes[archetype_position].components[i], position, 0);				
 
-				char* copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * position;
-				char* copy_data_dst = archetypes[archetype_position].components[i].data.data();
-
-				memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-
-				if (position == archetypes[_ent.archetype].entities.size() - 1) {
-					archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1));
+				if (position == archetypes[_ent.archetype].entities.size() - 1) {					
 					move_back = false;
 				}
 				else {
-					copy_data_dst = copy_data_src;
-					copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1);
-					memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-					archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1));
+					copyLast(oldArchetype2.components[i], oldArchetype2.entities.size(), position);										
 				}
+				resizeComponent(oldArchetype2.components[i], oldArchetype2.entities.size() - 1);
+				
 			}
 
 			if (move_back) {
@@ -190,14 +187,13 @@ namespace game {
 			archetypes[_ent.archetype].entities.pop_back();
 
 			size_t temp_typeSize = sizeof(Component);
-			uint32_t position_of_last_component = archetypes[archetype_position].components.size();
+			uint32_t positionOfLastComponent = archetypes[archetype_position].components.size();
 			std::vector<char> new_data;
 			ComponentType new_type = { new_data, temp_typeSize };
 			archetypes[archetype_position].components.push_back(new_type);
-			archetypes[archetype_position].components[position_of_last_component].data.resize(temp_typeSize);
-			Component copy_data_src = Component(_args...);
-			char* copy_data_dst = archetypes[archetype_position].components[position_of_last_component].data.data();
-			memcpy(copy_data_dst, &copy_data_src, temp_typeSize);
+			resizeComponent(archetypes[archetype_position].components[positionOfLastComponent], 1);
+			Component copyData = Component(_args...);
+			copyNewComponent(copyData, archetypes[archetype_position].components[positionOfLastComponent], 0);
 
 			archetypes[archetype_position].entities.push_back(_ent.id);
 
