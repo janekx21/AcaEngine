@@ -105,6 +105,7 @@ int main()
 
 	}
 	std::cout << "RegsitryTest done!\n";
+	return EXIT_SUCCESS;
 }
 /* {
 	game::Registry registry;
@@ -121,5 +122,5 @@ int main()
 	registry.erase(new_entity_1);
 	registry.erase(new_entity_3);
 	registry.print_entities();
-	return EXIT_SUCCESS;
+	
 }*/

@@ -107,8 +107,8 @@ namespace game {
 				for (int i = 0; i < oldArchetype.types.size(); i++) {
 					for (int j = 0; j < archetype.types.size(); j++) {
 						if (entityTypes[i] == archetype.types[j]) {
+							size_t temp_typeSize = archetype.components[j].typeSize;
 
-							size_t temp_typeSize = archetype.components[j].typeSize;							
 							resizeComponent(archetype.components[j], archetype.entities.size() + 1);
 							copyComponent(oldArchetype.components[i], archetype.components[j], position, archetype.entities.size());
 
@@ -133,9 +133,9 @@ namespace game {
 					if (typeid(Component).hash_code() == archetype.types[j]) {
 						size_t temp_typeSize = archetype.components[j].typeSize;
 						typesCount = j;
+
 						resizeComponent(archetype.components[j], archetype.entities.size() + 1);
-						copyNewComponent<Component>(Component(_args...), archetype.components[j], archetype.entities.size());
-						
+						copyNewComponent<Component>(Component(_args...), archetype.components[j], archetype.entities.size());						
 						break;
 					}
 				}
@@ -166,6 +166,7 @@ namespace game {
 				std::vector<char> new_data;
 				ComponentType new_type = { new_data, temp_typeSize };
 				archetypes[archetype_position].components.push_back(new_type);
+
 				resizeComponent(archetypes[archetype_position].components[i], 1);
 				copyComponent(oldArchetype2.components[i], archetypes[archetype_position].components[i], position, 0);				
 
@@ -189,6 +190,7 @@ namespace game {
 			std::vector<char> new_data;
 			ComponentType new_type = { new_data, temp_typeSize };
 			archetypes[archetype_position].components.push_back(new_type);
+
 			resizeComponent(archetypes[archetype_position].components[positionOfLastComponent], 1);
 			Component copyData = Component(_args...);
 			copyNewComponent(copyData, archetypes[archetype_position].components[positionOfLastComponent], 0);
@@ -236,7 +238,6 @@ namespace game {
 							resizeComponent(archetype.components[j], (archetype.entities.size() + 1));
 							copyComponent(oldArchetype.components[i], archetype.components[j], position, archetype.entities.size());
 
-
 							if (position == (oldArchetype.entities.size() - 1)) {
 								move_back = false;
 							}
@@ -250,10 +251,7 @@ namespace game {
 
 				if (move_back) {
 					oldArchetype.entities[position] = oldArchetype.entities.back();
-				}
-
-				
-				
+				}				
 
 				for (int j = 0; j < oldArchetype.types.size(); j++) {
 					if (typeid(Component).hash_code() == oldArchetype.types[j]) {
@@ -606,8 +604,7 @@ namespace game {
 			size_t size = _cT.typeSize;
 			_cT.data.resize(size * (_Size));
 		};
-
-
-
 	};
+
+	
 }// namespace game
