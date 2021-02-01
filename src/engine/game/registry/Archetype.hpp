@@ -3,7 +3,7 @@
 #include <vector>
 struct Archetype {
 
-	std::vector<size_t> types; // TODO move to ComponentType
+	std::vector<size_t> types; 
 	std::vector<ComponentType> components;
-	std::vector<uint32_t> entities;// hashmap better maybe
+	std::vector<uint32_t> entities;
 };
