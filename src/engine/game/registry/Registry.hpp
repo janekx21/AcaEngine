@@ -30,6 +30,8 @@ namespace game {
 			getEmptyArchetype().entities.push_back(entity.id);
 			return entity;
 		};
+		
+		
 
 		/**
 		 * Removes entity from its archetype and erases its component data
@@ -38,29 +40,7 @@ namespace game {
 		void erase(Entity _ent) {
 			flags[_ent.id] = false;
 			uint32_t position = getPositionInArchetype(_ent);
-
-			bool shift = true;
-			auto &ownArchetype = archetypes[_ent.archetype];
-			for (auto &component : ownArchetype.components) {
-				size_t size = component.typeSize;
-				bool isLast = position == ownArchetype.entities.size() - 1;
-				if (isLast) {
-					shift = false;
-				} else {
-					// copy last element to my position
-					char *copy_data_src = component.data.data() + size * (ownArchetype.entities.size() - 1);
-					char *copy_data_dst = component.data.data() + size * position;
-					memcpy(copy_data_dst, copy_data_src, size);
-				}
-				component.data.resize(size * (ownArchetype.entities.size() - 1));
-			}
-
-			if (shift) {
-				// move last entity to free space
-				ownArchetype.entities[position] = ownArchetype.entities.back();
-			}
-
-			ownArchetype.entities.pop_back();
+			removeLast(archetypes[_ent.archetype], position);
 		}
 
 		EntityRef getRef(Entity _ent) const {
@@ -176,7 +156,7 @@ namespace game {
 
 			std::vector <ComponentType> new_archetype_components;
 			std::vector <uint32_t> new_archetype_entities;
-			Archetype new_archetype = { entity_types, new_archetype_components, new_archetype_entities };
+			Archetype new_archetype = { entityTypes, new_archetype_components, new_archetype_entities };
 
 			uint32_t archetype_position = archetypes.size();
 			archetypes.push_back(new_archetype);
@@ -603,5 +583,34 @@ namespace game {
 			}
 			return archetype_exists;
 		}
+		void removeLast(Archetype& _archetype, uint32_t& _position) {
+			bool shift = true;
+			for (auto& component : _archetype.components) {
+				size_t size = component.typeSize;
+				bool isLast = _position == _archetype.entities.size() - 1;
+				if (isLast) {
+					shift = false;
+				}
+				else {
+					// copy last element to my position
+					char* copy_data_src = component.data.data() + size * (_archetype.entities.size() - 1);
+					char* copy_data_dst = component.data.data() + size * _position;
+					memcpy(copy_data_dst, copy_data_src, size);
+				}
+				component.data.resize(size * (_archetype.entities.size() - 1));
+			}
+
+			if (shift) {
+				// move last entity to free space
+				_archetype.entities[_position] = _archetype.entities.back();
+			}
+
+			_archetype.entities.pop_back();
+
+		};
+
+	
+
+		
 	};
 }// namespace game
