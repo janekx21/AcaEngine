@@ -252,19 +252,21 @@ namespace game {
 					oldArchetype.entities[position] = oldArchetype.entities.back();
 				}
 
-				oldArchetype.entities.pop_back();//attention entitiesvector is now one entry smaller
+				
+				
 
 				for (int j = 0; j < oldArchetype.types.size(); j++) {
 					if (typeid(Component).hash_code() == oldArchetype.types[j]) {
 						size_t temp_typeSize = sizeof(Component);
 						if (position != oldArchetype.entities.size()) {
-							copyLast(oldArchetype.components[j], oldArchetype.entities.size() + 1, position);
+							copyLast(oldArchetype.components[j], oldArchetype.entities.size(), position);
 						}						
 						resizeComponent(oldArchetype.components[j], oldArchetype.entities.size());
 						break;
 					}
 				}
 
+				oldArchetype.entities.pop_back();//attention entitiesvector is now one entry smaller
 				archetype.entities.push_back(_ent.id);
 
 				_ent.archetype = k;
@@ -280,6 +282,8 @@ namespace game {
 			uint32_t archetype_position = archetypes.size();
 			archetypes.push_back(new_archetype);
 
+			auto& oldArchetype2 = archetypes[_ent.archetype];
+
 			bool move_back = true;
 			bool archetype_empty = false;
 
@@ -287,52 +291,42 @@ namespace game {
 				if (i == positionOfComponentToBeRemoved) {
 					continue;
 				}
-				size_t temp_typeSize = archetypes[_ent.archetype].components[i].typeSize;
+				size_t temp_typeSize = oldArchetype2.components[i].typeSize;
 
 				std::vector<char> new_data;
 				ComponentType new_type = { new_data, temp_typeSize };
 				archetypes[archetype_position].components.push_back(new_type);
 
-				archetypes[archetype_position].components[archetypes[archetype_position].components.size() - 1].data.resize(temp_typeSize);
+				resizeComponent(archetypes[archetype_position].components[archetypes[archetype_position].components.size() - 1], 1);
+				copyComponent(oldArchetype2.components[i], archetypes[archetype_position].components[archetypes[archetype_position].components.size() - 1], position, 0);
 
-				char* copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * position;
-				char* copy_data_dst = archetypes[archetype_position].components[archetypes[archetype_position].components.size() - 1].data.data();
+				
 
-				memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-
-				if (position == archetypes[_ent.archetype].entities.size() - 1) {
-					archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1));
+				if (position == oldArchetype2.entities.size() - 1) {
 					move_back = false;
 				}
 				else {
-					copy_data_dst = copy_data_src;
-					copy_data_src = archetypes[_ent.archetype].components[i].data.data() + temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1);
-					memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-					archetypes[_ent.archetype].components[i].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1));
+					copyLast(oldArchetype2.components[i], oldArchetype2.entities.size(), position);
+					
 				}
+				resizeComponent(oldArchetype2.components[i], oldArchetype2.entities.size() - 1);
 			}
 
 
-			for (int j = 0; j < archetypes[_ent.archetype].types.size(); j++) {
-				if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[j]) {
-					size_t temp_typeSize = sizeof(Component);
-					if (position == archetypes[_ent.archetype].entities.size() - 1) {
-						archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1));
-					}
-					else {
-						char* copy_data_src = archetypes[_ent.archetype].components[j].data.data() + temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1);
-						char* copy_data_dst = archetypes[_ent.archetype].components[j].data.data() + temp_typeSize * position;
-						memcpy(copy_data_dst, copy_data_src, temp_typeSize);
-						archetypes[_ent.archetype].components[j].data.resize(temp_typeSize * (archetypes[_ent.archetype].entities.size() - 1));
-					}
+			for (int j = 0; j < oldArchetype2.types.size(); j++) {
+				if (typeid(Component).hash_code() == oldArchetype2.types[j]) {
+					if (position != oldArchetype2.entities.size() - 1) {
+						copyLast(oldArchetype2.components[j], archetypes[_ent.archetype].entities.size(), position);
+					}					
+					resizeComponent(oldArchetype2.components[j], oldArchetype2.entities.size() - 1);
 					break;
 				}
 			}
 
 			if (move_back) {
-				archetypes[_ent.archetype].entities[position] = archetypes[_ent.archetype].entities.back();
+				oldArchetype2.entities[position] = oldArchetype2.entities.back();
 			}
-			archetypes[_ent.archetype].entities.pop_back();
+			oldArchetype2.entities.pop_back();
 
 			archetypes[archetype_position].entities.push_back(_ent.id);
 
