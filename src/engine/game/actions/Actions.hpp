@@ -13,6 +13,14 @@ namespace game {
 		}
 
 	private:
+		//graphics::MeshRenderer meshRenderer;
 		std::shared_ptr<graphics::MeshRenderer> meshRenderer;
 	};
+	/*class Physics {
+		Update(float _time, float _deltaTime) {
+
+		}
+	public:
+	private:
+	};*/
 }

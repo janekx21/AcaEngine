@@ -12,8 +12,11 @@ void game::HorizontalSpring::update(float _time, float _deltaTime) {
 void game::HorizontalSpring::draw(float _time, float _deltaTime) {
 
 	meshRenderer.clear();
+	//registry.execute<Mesh, Texture, Transform>(Draw(meshRenderer));
 	registry.execute<Mesh, Texture, Transform>([&](Mesh _mesh, Texture _texture, Transform _transform) {
-		meshRenderer.draw(mesh, *texture, glm::translate(glm::mat4(1), glm::vec3(0, 0, 0))); }); // ToDo: execute Action not Lambda
+		meshRenderer.draw(*_mesh.mesh, *_texture.texture, glm::translate(glm::mat4(1), _transform.position));
+		
+		}); // ToDo: execute Action not Lambda
 	
 	meshRenderer.present(camera);
 }
