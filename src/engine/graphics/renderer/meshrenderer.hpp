@@ -13,14 +13,14 @@ namespace graphics {
 	public:
 		MeshRenderer();
 
-		void draw(const Mesh& _mesh, const Texture2D& _texture, const glm::mat4& _transform);
+		void draw(const Mesh& _mesh, const Texture2D& _texture, const glm::mat4 _transform);
 		void present(const Camera& _camera);
 		void clear();
 	private:
 		struct MeshInstance {
 			const Mesh& mesh;
 			const Texture2D& texture;
-			const glm::mat4& transform;
+			const glm::mat4 transform;
 		};
 
 		Program program;

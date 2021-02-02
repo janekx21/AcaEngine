@@ -8,11 +8,11 @@
 
 //Render Components:
 struct Mesh {
-	std::shared_ptr<graphics::Mesh> mesh;
+	graphics::Mesh* mesh;
 	
 };
 struct Texture {
-	std::shared_ptr<graphics::Texture2D> texture;
+	graphics::Texture2D::Handle texture;
 };
 
 struct Transform {
