@@ -10,7 +10,7 @@ game::Game::Game() {
 	GLFWwindow *window = graphics::Device::getWindow();
 	input::InputManager::initialize(window);
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(.1f, .1f, .15f, 1);
+	glClearColor(1.f, 1.f, 1.f, 1);
 }
 
 game::Game::~Game() {

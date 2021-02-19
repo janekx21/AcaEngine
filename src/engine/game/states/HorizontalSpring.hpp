@@ -20,7 +20,6 @@ namespace game {
 	private:
 		Registry registry;
 		graphics::Camera camera;
-		glm::mat4 modelMatrix;
 		graphics::MeshRenderer meshRenderer;
 		graphics::Mesh mesh;
 		graphics::Texture2D::Handle texture;

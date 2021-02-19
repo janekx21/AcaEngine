@@ -21,10 +21,9 @@ void game::HorizontalSpring::draw(float _time, float _deltaTime) {
 }
 
 game::HorizontalSpring::HorizontalSpring() : game::GameState(),
-																						 camera(graphics::Camera(90, .1f, 100)),
+																						 camera(graphics::Camera(90, .1f, 500)),
 																						 mesh(graphics::Mesh("models/sphere.obj")),
-																						 meshRenderer(),
-																						 modelMatrix(glm::identity<glm::mat4>()),
+																						 meshRenderer(),																						 
 																						 registry(){
 	std::vector<Entity> entities;
 	auto _mesh = &mesh;

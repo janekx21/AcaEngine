@@ -10,13 +10,14 @@
 #include <engine/game/states/HorizontalSpring.hpp>
 #include <engine/game/states/MovingPlanets.hpp>
 #include <engine/game/states/Start.hpp>
+#include <engine/game/states/Shooter.hpp>
 
 int main()
 {
 	game::Game game;
-	game::HorizontalSpring state;
+	game::Shooter state;
 	
-	game.run(std::make_unique<game::HorizontalSpring>(state));
+	game.run(std::make_unique<game::Shooter>(state));
 
 	game.~Game();
 
