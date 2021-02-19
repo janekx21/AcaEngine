@@ -24,7 +24,6 @@ namespace game {
 		graphics::MeshRenderer meshRenderer;
 		graphics::Mesh mesh;
 		graphics::Texture2D::Handle texture;
-		float velocity;
-		float position;
+		
 	};
 }

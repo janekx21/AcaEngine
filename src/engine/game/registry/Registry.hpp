@@ -352,7 +352,7 @@ namespace game {
 			uint32_t position = getPositionInArchetype(_ent);
 			for (int i = 0; i < archetypes[_ent.archetype].types.size(); i++) {
 				if (typeid(Component).hash_code() == archetypes[_ent.archetype].types[i]) {
-					Component& component_reference = *reinterpret_cast<Component*>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
+					Component* component_reference = reinterpret_cast<Component*>(archetypes[_ent.archetype].components[i].data.data() + sizeof(Component) * position);
 					return component_reference;
 				}
 			}
@@ -387,8 +387,7 @@ namespace game {
 		// In addition, the entity itself is provided if
 		// the first parameter is of type Entity.
 		template<typename... Args, typename Action>
-		void execute(const Action& _action) {
-			//using allComponents = std::tuple<Args...>;
+		void execute(const Action& _action) {			
 
 			bool hasAllComponents;
 			bool first_is_entity = false;
@@ -451,9 +450,9 @@ namespace game {
 
 
 		template<component_concept Component, typename... Args, typename Action, typename Tuple>
-		void executeHelper(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t>& _component_flags, int i, int& s) {
+		void executeHelper(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t>& _component_flags, int& i, int& s) {
 
-			auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component[_component_flags[s]].data.data() + _component[s].typeSize * i)));
+			auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component[_component_flags[s]].data.data() + _component[_component_flags[s]].typeSize * i)));
 			if constexpr (sizeof...(Args) > 0) {
 				s++;
 				executeHelper<Args...>(_action, tuple, _component, _component_flags, i, s);
@@ -464,7 +463,7 @@ namespace game {
 		}
 
 		template<component_concept Component, typename... Args, typename Action, typename Tuple>
-		void executeHelper_Entity(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t> _component_flags, int i, int& s, Entity _entity) {
+		void executeHelper_Entity(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t>& _component_flags, int& i, int& s, Entity& _entity) {
 			auto tuple = std::make_tuple(_entity);
 			executeHelper<Args...>(_action, tuple, _component, _component_flags, i, s);
 		}

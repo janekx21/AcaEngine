@@ -15,10 +15,14 @@ struct Texture {
 	graphics::Texture2D::Handle texture;
 };
 
-struct Transform {
-	glm::vec3 position;
+struct Transform {	
 	glm::quat rotation;
 	glm::vec3 scale;
+	glm::vec3 position;
+};
+struct Velocity {
+	glm::vec3 velocity;
+	
 };
 
 

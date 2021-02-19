@@ -16,10 +16,8 @@ int main()
 	game::Game game;
 	game::HorizontalSpring state;
 	
-	//game::MovingPlanets state;
 	game.run(std::make_unique<game::HorizontalSpring>(state));
-	
-	//game.run(std::make_unique<game::MovingPlanets>(state));
+
 	game.~Game();
 
 	return EXIT_SUCCESS;
