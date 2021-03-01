@@ -416,6 +416,7 @@ namespace game {
 						}
 						if (component_type_exists) {
 							component_flags.push_back(i);
+							break;
 						}
 					}
 
@@ -450,7 +451,7 @@ namespace game {
 
 
 		template<component_concept Component, typename... Args, typename Action, typename Tuple>
-		void executeHelper(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t>& _component_flags, int& i, int& s) {
+		void executeHelper(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t>& _component_flags, int i, int& s) {
 
 			auto tuple = std::tuple_cat(_tuple, std::tie(*reinterpret_cast<Component*>(_component[_component_flags[s]].data.data() + _component[_component_flags[s]].typeSize * i)));
 			if constexpr (sizeof...(Args) > 0) {
@@ -463,7 +464,7 @@ namespace game {
 		}
 
 		template<component_concept Component, typename... Args, typename Action, typename Tuple>
-		void executeHelper_Entity(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t>& _component_flags, int& i, int& s, Entity& _entity) {
+		void executeHelper_Entity(Action& _action, Tuple& _tuple, std::vector<ComponentType>& _component, std::vector<uint32_t>& _component_flags, int i, int& s, Entity& _entity) {
 			auto tuple = std::make_tuple(_entity);
 			executeHelper<Args...>(_action, tuple, _component, _component_flags, i, s);
 		}

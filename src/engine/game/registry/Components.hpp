@@ -24,5 +24,14 @@ struct Velocity {
 	glm::vec3 velocity;
 	
 };
+struct AngularVelocity {
+	float velocity; 
+};
+struct Visibility {
+	bool visible;
+};
+struct Number {
+	int number;
+};
 
 

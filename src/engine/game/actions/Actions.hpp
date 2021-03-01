@@ -6,10 +6,12 @@ namespace game {
 	class Actions {
 	public:
 		static void Draw(graphics::MeshRenderer& _meshRenderer, Registry& _registry) {
-			_registry.execute<Mesh, Texture, Transform>([&](Mesh _mesh, Texture _texture, Transform& _transform) {
-				_meshRenderer.draw(*_mesh.mesh, *_texture.texture, glm::scale(glm::translate(glm::mat4(1), _transform.position) * glm::toMat4(_transform.rotation), _transform.scale));
+			_registry.execute<Mesh, Texture, Transform, Visibility>([&](Mesh _mesh, Texture _texture, Transform& _transform, Visibility& _visibility) {
+				if (_visibility.visible==true) {
+					_meshRenderer.draw(*_mesh.mesh, *_texture.texture, glm::scale(glm::translate(glm::mat4(1), _transform.position) * glm::toMat4(_transform.rotation), _transform.scale));
+				}
 
-				}); 
+			}); 
 		}
 
 	};

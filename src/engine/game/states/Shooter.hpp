@@ -26,5 +26,9 @@ namespace game {
 		graphics::Texture2D::Handle texture_planet;
 		graphics::Texture2D::Handle texture_box;
 
+		std::vector<Entity> boxes;
+		int number_boxes;
+		float counter_time;
+		int counter_boxes;
 	};
 }
