@@ -55,3 +55,4 @@ bool game::Start::getIsFinished()
 {
 	return end;
 }
+

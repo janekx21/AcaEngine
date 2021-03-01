@@ -14,7 +14,7 @@ namespace graphics {
 		albedoTextureLocation = program.getUniformLoc("albedo_texture");
 	}
 
-	void MeshRenderer::draw(const Mesh& _mesh, const Texture2D& _texture, const glm::mat4& _transform) {
+	void MeshRenderer::draw(const Mesh& _mesh, const Texture2D& _texture, const glm::mat4 _transform) {
 		struct MeshInstance mesh_instance = { _mesh, _texture, _transform};
 		MeshRenderer::meshQueue.push_back(mesh_instance);
 	}

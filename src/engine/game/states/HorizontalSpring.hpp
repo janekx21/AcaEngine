@@ -4,6 +4,7 @@
 #include "engine/graphics/core/texture.hpp"
 #include "engine/graphics/renderer/mesh.hpp"
 #include "engine/graphics/renderer/meshrenderer.hpp"
+#include "engine/game/registry/Registry.hpp"
 
 namespace game {
 	class HorizontalSpring : public game::GameState {
@@ -17,12 +18,11 @@ namespace game {
 		bool getIsFinished() override;
 
 	private:
+		Registry registry;
 		graphics::Camera camera;
-		glm::mat4 modelMatrix;
 		graphics::MeshRenderer meshRenderer;
 		graphics::Mesh mesh;
 		graphics::Texture2D::Handle texture;
-		float velocity;
-		float position;
+		
 	};
 }

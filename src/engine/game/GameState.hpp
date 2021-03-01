@@ -12,5 +12,6 @@ namespace game {
 		virtual void draw(float _time, float _deltaTime) = 0;
 
 		virtual bool getIsFinished() = 0;
+
 	};
 }
