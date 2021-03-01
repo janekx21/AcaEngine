@@ -1,12 +1,14 @@
 #pragma once
 #include "engine/game/GameState.hpp"
 #include "engine/graphics/camera.hpp"
+#include "engine/graphics/core/framebuffer.hpp"
 #include "engine/graphics/renderer/meshrenderer.hpp"
 
 namespace game {
 	class ExampleScene : public game::GameState {
 	public:
 		ExampleScene();
+		ExampleScene(const game::ExampleScene &) = delete;
 		void onPause() override{};
 		void onResume() override{};
 
@@ -20,5 +22,8 @@ namespace game {
 		graphics::Mesh scene;
 		graphics::Texture2D::Handle white;
 		bool shouldFinish = false;
+		graphics::FrameBuffer backBuffer;
+		graphics::Texture2D *depthTexture;
+		graphics::Texture2D *colorTexture;
 	};
 }// namespace game
