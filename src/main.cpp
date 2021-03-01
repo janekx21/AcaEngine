@@ -16,10 +16,10 @@ int main()
 {
 	game::Game game;
 	game::Shooter state;
-	
+	//game::HorizontalSpring state;
 	game.run(std::make_unique<game::Shooter>(state));
 
-	game.~Game();
+	//game.run(std::make_unique<game::HorizontalSpring>(state));
 
 	return EXIT_SUCCESS;
 }
