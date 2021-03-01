@@ -7,7 +7,7 @@
 #include <numbers>
 
 void game::Shooter::update(float _time, float _deltaTime) {
-	//ToDo: spawn crates 
+	//ToDo: spawn crates  
 	if (counter_time >= 1.0) {
 		counter_time = 0.0;
 		int counter_while = 0;
@@ -17,7 +17,6 @@ void game::Shooter::update(float _time, float _deltaTime) {
 				break;
 			}
 			bool& visible = registry.getComponentUnsafe<Visibility>(boxes[counter_boxes]).visible;
-			std::cout << "visible/counter" << visible << "/" << counter_boxes << "\n";
 			if (visible) {
 				counter_boxes++;
 				if (counter_boxes == number_boxes) {
@@ -34,27 +33,34 @@ void game::Shooter::update(float _time, float _deltaTime) {
 	
 	
 	//update position
-	registry.execute</*Number,*/ Velocity, Transform, Number/*, AngularVelocity*/>([&](/*Number& _number,*/ Velocity& _velocity, Transform& _transform, Number& _number/*, AngularVelocity& _angularVelocity*/) {
-		std::cout << "pos" << _transform.position.x << "\n";		
+	registry.execute<Number, Velocity, Transform/*, AngularVelocity*/>([&](Number& _number, Velocity& _velocity, Transform& _transform/*, AngularVelocity& _angularVelocity*/) {
+		//std::cout << "pos" << _transform.position.x << "\n";		
+		//std::cout << "vel" << _velocity.velocity.x << "\n";	
+
 		if (_transform.position.x >= 10) {
+			
 			_velocity.velocity.x = -_velocity.velocity.x;
+
 		}
 		
 		if (_transform.position.x <= -10){
 			_velocity.velocity.x = -_velocity.velocity.x;
 		}
-		std::cout << "pos" << _transform.position.y << "\n";
+		//std::cout << "pos" << _transform.position.y << "\n";
+		//std::cout << "vel" << _velocity.velocity.y << "\n";
 		if (_transform.position.y >= 10 || _transform.position.y <= -10) {
 			_velocity.velocity.y = -_velocity.velocity.y;
 		}
-		std::cout << "pos" << _transform.position.z << "\n";		
+		//std::cout << "pos" << _transform.position.z << "\n";
+		//std::cout << "vel" << _velocity.velocity.z << "\n";
 		if (_transform.position.z >= 10 || _transform.position.z <= -10) {
 			_velocity.velocity.z = -_velocity.velocity.z;
 		}
+		std::cout << "pre pos: " << _transform.position.x << "/" <<  _transform.position.y << "/" << _transform.position.z << " vel: " << _velocity.velocity.x << "/" << _velocity.velocity.y << "/" << _velocity.velocity.z << "\n";
 		_transform.position.x += _velocity.velocity.x * _deltaTime ;
 		_transform.position.y += _velocity.velocity.y * _deltaTime ;
 		_transform.position.z += _velocity.velocity.z * _deltaTime ;
-
+		std::cout << "after pos: " << _transform.position.x << "/" << _transform.position.y << "/" << _transform.position.z << "\n";
 		//_transform.rotation *= glm::quat(1, _angularVelocity.velocity * std::numbers::pi, _angularVelocity.velocity * std::numbers::pi, _angularVelocity.velocity * std::numbers::pi);
 		});
 
@@ -92,13 +98,12 @@ game::Shooter::Shooter() :			game::GameState(),
 	
 	for (int i = 0; i < number_boxes; i++) {
 		boxes.push_back(registry.create());
-		registry.addComponent<Visibility>(boxes[i], false);
-		
-		
+		registry.addComponent<Visibility>(boxes[i], false);		
 		registry.addComponent<Mesh>(boxes[i], _mesh_box);
+		registry.addComponent<Velocity>(boxes[i], glm::vec3(std::rand() % 6 - 3, std::rand() % 6 - 3, std::rand() % 6 - 3));
 		registry.addComponent<Texture>(boxes[i], texture_box);
 		registry.addComponent<Transform>(boxes[i], glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(std::rand()%20 -10, std::rand() % 20 -10, std::rand() % 20 - 10));
-		registry.addComponent<Velocity>(boxes[i], glm::vec3(std::rand()% 6 - 3, std::rand() % 6 - 3, std::rand() % 6 - 3));
+		
 		registry.addComponent<Number>(boxes[i], i);
 		
 		//registry.addComponent<AngularVelocity>(boxes[i], std::rand() % 10 / 10);
