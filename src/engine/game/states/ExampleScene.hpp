@@ -27,5 +27,6 @@ namespace game {
 		graphics::FrameBuffer backBuffer;
 		graphics::Texture2D *depthTexture;
 		graphics::Texture2D *colorTexture;
+		graphics::Texture2D *normalTexture;
 	};
 }// namespace game

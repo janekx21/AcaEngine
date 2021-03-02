@@ -23,8 +23,10 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 
 	depthTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::D32F, sampler);
 	colorTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGB8, sampler);
+	normalTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGB8, sampler);
 	backBuffer.attachDepth(*depthTexture, 0);
 	backBuffer.attach(0, *colorTexture, 0);
+	backBuffer.attach(1, *normalTexture, 0);
 
 	program = graphics::Program();
 	program.attach(graphics::ShaderManager::get("shader/fullscreen.vert",graphics:: ShaderType::VERTEX));
@@ -41,7 +43,7 @@ void game::ExampleScene::update(float _time, float _deltaTime) {
 void game::ExampleScene::draw(float _time, float _deltaTime) {
 	meshRenderer.draw(scene, *white, glm::identity<glm::mat4>());
 
-	if (input::InputManager::isKeyPressed(input::Key::SPACE)) {
+	if (!input::InputManager::isKeyPressed(input::Key::SPACE)) {
 		backBuffer.bind();
 		backBuffer.clear();
 		meshRenderer.present(camera);
@@ -52,11 +54,13 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 		auto slot2 = 1;
 		colorTexture->bind(slot);
 		depthTexture->bind(slot2);
+		normalTexture->bind(2);
 		program.use();
 		auto loc = program.getUniformLoc("color_texture");
 		auto loc2 = program.getUniformLoc("depth_texture");
 		program.setUniform(loc, slot);
 		program.setUniform(loc2, slot2);
+		program.setUniform(program.getUniformLoc("normal_texture"), 2);
 		quad.draw();
 	} else{
 		meshRenderer.present(camera);
