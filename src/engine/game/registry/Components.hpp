@@ -34,7 +34,7 @@ struct Number {
 	int number;
 };
 struct ObjectType {
-	int type; //0 - box | 1 - planet
+	int type; //0 = box = target| 1 = planet = projectile
 };
 
 

@@ -10,7 +10,7 @@
 
 void game::Shooter::update(float _time, float _deltaTime) {
 	//ToDo: destroy planets if far away
-	//ToDo: spawn crates  
+	//ToDo: spawning crates  
 	if (counter_time >= 1.0) {
 		counter_time = 0.0;
 		int counter_while = 0;
@@ -37,6 +37,7 @@ void game::Shooter::update(float _time, float _deltaTime) {
 	game::Actions::UpdateCratePosition(registry, _deltaTime);
 	game::Actions::UpdateRotation(registry, _deltaTime);
 
+	//spawning planets acurrate
 	if (input::InputManager::isButtonPressed(input::MouseButton::LEFT)) {
 		planets.push_back(registry.create());
 		registry.addComponent<Mesh>(planets[planets.size() - 1], &mesh_planet);
@@ -47,9 +48,18 @@ void game::Shooter::update(float _time, float _deltaTime) {
 		registry.addComponent<Visibility>(planets[planets.size() - 1], true);
 		registry.addComponent<AngularVelocity>(planets[planets.size() - 1], glm::quat(glm::vec3(std::rand() % 360 - 180, std::rand() % 360 - 180, std::rand() % 360 - 180)));
 		registry.addComponent<ObjectType>(planets[planets.size() - 1], 1);
-
-
-
+	}
+	//spawning planets spray
+	if (input::InputManager::isButtonPressed(input::MouseButton::RIGHT)) {		
+		planets.push_back(registry.create());
+		registry.addComponent<Mesh>(planets[planets.size() - 1], &mesh_planet);
+		registry.addComponent<Texture>(planets[planets.size() - 1], texture_planet);
+		registry.addComponent<Transform>(planets[planets.size() - 1], glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(0, 0, 40));
+		int speeed = 10;
+		registry.addComponent<Velocity>(planets[planets.size() - 1], glm::vec3(camera.toWorldSpace(input::InputManager::getCursorPos()).x * speeed + (std::rand() % 200 - 100)/10, camera.toWorldSpace(input::InputManager::getCursorPos()).y * speeed + (std::rand() % 200 - 100) / 10, -speeed));
+		registry.addComponent<Visibility>(planets[planets.size() - 1], true);
+		registry.addComponent<AngularVelocity>(planets[planets.size() - 1], glm::quat(glm::vec3(std::rand() % 360 - 180, std::rand() % 360 - 180, std::rand() % 360 - 180)));
+		registry.addComponent<ObjectType>(planets[planets.size() - 1], 1);		
 	}
 
 
