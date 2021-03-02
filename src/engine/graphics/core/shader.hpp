@@ -78,6 +78,9 @@ namespace graphics {
 		void setUniform(int _location, const glm::uvec3& _value);
 		void setUniform(int _location, const glm::uvec4& _value);
 
+		/// Array versions
+		void setUniform(int _location, const std::vector<glm::vec3> &values);
+
 		/// Get OpenGL handle
 		unsigned getID() const { return m_programID; }
 	private:

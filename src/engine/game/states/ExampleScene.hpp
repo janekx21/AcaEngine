@@ -24,9 +24,16 @@ namespace game {
 		graphics::Program program;
 		graphics::Texture2D::Handle white;
 		bool shouldFinish = false;
+		glm::vec3 pos;
+		float rot;
+
+		// partial deferred rendering
 		graphics::FrameBuffer backBuffer;
-		graphics::Texture2D *depthTexture;
-		graphics::Texture2D *colorTexture;
+		graphics::Texture2D *positionTexture;
 		graphics::Texture2D *normalTexture;
+		graphics::Texture2D *colorTexture;
+		graphics::Texture2D *depthTexture;
+		graphics::Texture2D *noiseTexture;
+		std::vector<glm::vec3> sampleList;
 	};
 }// namespace game

@@ -13,67 +13,63 @@ namespace graphics {
 	static GLenum NUM_COMPS_TO_INTERNAL_FORMAT[] = {GL_R8, GL_RG8, GL_RGB8, GL_RGBA8};
 	static GLenum NUM_COMPS_TO_INTERNAL_FORMAT_SRGB[] = {GL_SRGB8, GL_SRGB8_ALPHA8};
 
-	static GLenum formatToDataFormat(TexFormat _format)
-	{
-		switch(_format)
-		{
-		case TexFormat::D32F:
-		case TexFormat::D32:
-		case TexFormat::D24S8:
-		case TexFormat::D32FS8:
-			return 0;
-		case TexFormat::RGBA32F:
-		case TexFormat::RGBA32I:
-		case TexFormat::RGBA32U:
-		case TexFormat::RGBA16F:
-		case TexFormat::RGBA16I:
-		case TexFormat::RGBA16U:
-		case TexFormat::RGBA8:
-		case TexFormat::RGBA8U:
-		case TexFormat::RGBA8I:
-		case TexFormat::C_BC5_sRGBA:
-		case TexFormat::C_BC5_RGBA:
-			return GL_RGBA;
-		case TexFormat::RGB8:
-		case TexFormat::RGB8U:
-		case TexFormat::RGB8I:
-		case TexFormat::R11G11B10F:
-		case TexFormat::RGB9E5:
-		case TexFormat::C_BPTC_RGB:
-		case TexFormat::C_BPTC_sRGB:
-			return GL_RGB;
-		case TexFormat::RG32F:
-		case TexFormat::RG32I:
-		case TexFormat::RG32U:
-		case TexFormat::RG16I:
-		case TexFormat::RG16F:
-		case TexFormat::RG16U:
-		case TexFormat::RG8:
-		case TexFormat::RG8U:
-		case TexFormat::RG8I:
-		case TexFormat::C_RGTC2_RGU:
-		case TexFormat::C_RGTC2_RGI:
-			return GL_RG;
-		case TexFormat::R32F:
-		case TexFormat::R32I:
-		case TexFormat::R32U:
-		case TexFormat::R16F:
-		case TexFormat::R16I:
-		case TexFormat::R16U:
-		case TexFormat::R8:
-		case TexFormat::R8U:
-		case TexFormat::R8I:
-			return GL_RED;
+	static GLenum formatToDataFormat(TexFormat _format) {
+		switch (_format) {
+			case TexFormat::D32F:
+			case TexFormat::D32:
+			case TexFormat::D24S8:
+			case TexFormat::D32FS8:
+				return 0;
+			case TexFormat::RGBA32F:
+			case TexFormat::RGBA32I:
+			case TexFormat::RGBA32U:
+			case TexFormat::RGBA16F:
+			case TexFormat::RGBA16I:
+			case TexFormat::RGBA16U:
+			case TexFormat::RGBA8:
+			case TexFormat::RGBA8U:
+			case TexFormat::RGBA8I:
+			case TexFormat::C_BC5_sRGBA:
+			case TexFormat::C_BC5_RGBA:
+				return GL_RGBA;
+			case TexFormat::RGB8:
+			case TexFormat::RGB8U:
+			case TexFormat::RGB8I:
+			case TexFormat::R11G11B10F:
+			case TexFormat::RGB9E5:
+			case TexFormat::C_BPTC_RGB:
+			case TexFormat::C_BPTC_sRGB:
+				return GL_RGB;
+			case TexFormat::RG32F:
+			case TexFormat::RG32I:
+			case TexFormat::RG32U:
+			case TexFormat::RG16I:
+			case TexFormat::RG16F:
+			case TexFormat::RG16U:
+			case TexFormat::RG8:
+			case TexFormat::RG8U:
+			case TexFormat::RG8I:
+			case TexFormat::C_RGTC2_RGU:
+			case TexFormat::C_RGTC2_RGI:
+				return GL_RG;
+			case TexFormat::R32F:
+			case TexFormat::R32I:
+			case TexFormat::R32U:
+			case TexFormat::R16F:
+			case TexFormat::R16I:
+			case TexFormat::R16U:
+			case TexFormat::R8:
+			case TexFormat::R8U:
+			case TexFormat::R8I:
+				return GL_RED;
 		}
 		return 0;
 	}
 
-	Texture2D::Texture2D(int _width, int _height, TexFormat _format, const Sampler& _sampler) :
-		m_width(_width),
-		m_height(_height),
-		m_format(_format),
-		m_sampler(&_sampler)
-	{
+	Texture2D::Texture2D(int _width, int _height, TexFormat _format, const Sampler &_sampler) : m_width(_width),
+																																															m_height(_height),
+																																															m_format(_format),
+																																															m_sampler(&_sampler) {
 		// Create openGL - resource
 		glGenTextures(1, &m_textureID);
 		glCall(glBindTexture, GL_TEXTURE_2D, m_textureID);
@@ -84,31 +80,25 @@ namespace graphics {
 		spdlog::info("[graphics] Created raw texture ", m_textureID, " .");
 	}
 
-	Texture2D::Texture2D(const char* _textureFileName, const Sampler& _sampler, bool _srgb) :
-		m_width(0),
-		m_height(0),
-		m_sampler(&_sampler),
-		m_bindlessHandle(0)
-	{
+	Texture2D::Texture2D(const char *_textureFileName, const Sampler &_sampler, bool _srgb) : m_width(0),
+																																														m_height(0),
+																																														m_sampler(&_sampler),
+																																														m_bindlessHandle(0) {
 		// Load from file
 		int numComponents = 0;
-		stbi_uc* textureData = stbi_load(_textureFileName, &m_width, &m_height, &numComponents, 0);
-		if(!textureData)
-		{
+		stbi_uc *textureData = stbi_load(_textureFileName, &m_width, &m_height, &numComponents, 0);
+		if (!textureData) {
 			spdlog::error("[graphics] Could not load texture '{}'.", _textureFileName);
 			return;
 		}
 
 		// Force black alpha
-		if(numComponents == 4)
-		{
-			for(int i = 0; i < m_width * m_height * 4; i += 4)
-			{
-				if(textureData[i + 3] == 0)
-				{
+		if (numComponents == 4) {
+			for (int i = 0; i < m_width * m_height * 4; i += 4) {
+				if (textureData[i + 3] == 0) {
 					textureData[i] = 0;
-					textureData[i+1] = 0;
-					textureData[i+2] = 0;
+					textureData[i + 1] = 0;
+					textureData[i + 2] = 0;
 				}
 			}
 		}
@@ -116,28 +106,24 @@ namespace graphics {
 		// Create openGL - resource
 		glGenTextures(1, &m_textureID);
 		glCall(glBindTexture, GL_TEXTURE_2D, m_textureID);
-		m_format = TexFormat((_srgb && numComponents >= 3) ? NUM_COMPS_TO_INTERNAL_FORMAT_SRGB[numComponents-3] : NUM_COMPS_TO_INTERNAL_FORMAT[numComponents-1]);
-		glCall(glTexImage2D, GL_TEXTURE_2D, 0, unsigned(m_format), m_width, m_height, 0, NUM_COMPS_TO_PIXEL_FORMAT[numComponents-1], GL_UNSIGNED_BYTE, textureData);
+		m_format = TexFormat((_srgb && numComponents >= 3) ? NUM_COMPS_TO_INTERNAL_FORMAT_SRGB[numComponents - 3] : NUM_COMPS_TO_INTERNAL_FORMAT[numComponents - 1]);
+		glCall(glTexImage2D, GL_TEXTURE_2D, 0, unsigned(m_format), m_width, m_height, 0, NUM_COMPS_TO_PIXEL_FORMAT[numComponents - 1], GL_UNSIGNED_BYTE, textureData);
 		glCall(glGenerateMipmap, GL_TEXTURE_2D);
 
 		stbi_image_free(textureData);
 
 		// Enable bindless access
 		m_bindlessHandle = glCall(glGetTextureSamplerHandleARB, m_textureID, m_sampler->getID());
-		if ( GLEW_ARB_bindless_texture ) 
-		{
+		if (GLEW_ARB_bindless_texture) {
 			glCall(glMakeTextureHandleResidentARB, m_bindlessHandle);
 		}
 
 		spdlog::info("[graphics] Loaded texture {} from '{}'.", m_textureID, _textureFileName);
 	}
 
-	Texture2D::~Texture2D()
-	{
-		if(m_bindlessHandle) 
-		{
-			if ( GLEW_ARB_bindless_texture )
-			{
+	Texture2D::~Texture2D() {
+		if (m_bindlessHandle) {
+			if (GLEW_ARB_bindless_texture) {
 				glCall(glMakeTextureHandleNonResidentARB, m_bindlessHandle);
 			}
 		}
@@ -146,30 +132,25 @@ namespace graphics {
 		spdlog::info("[graphics] Deleted texture {} .", m_textureID);
 	}
 
-	Texture2D::Handle Texture2D::load(const char* _fileName, const Sampler& _sampler, bool _srgb)
-	{
+	Texture2D::Handle Texture2D::load(const char *_fileName, const Sampler &_sampler, bool _srgb) {
 		return new Texture2D(_fileName, _sampler, _srgb);
 	}
 
-	void Texture2D::unload(Handle _texture)
-	{
+	void Texture2D::unload(Handle _texture) {
 		// The handle is defined as const, so nobody can do damage, but now we need
 		// the real address for deletion
-		delete const_cast<Texture2D*>(_texture);
+		delete const_cast<Texture2D *>(_texture);
 	}
 
-	Texture2D* Texture2D::create(int _width, int _height, int _numComponents, const Sampler& _sampler)
-	{
+	Texture2D *Texture2D::create(int _width, int _height, int _numComponents, const Sampler &_sampler) {
 		return new Texture2D(_width, _height, TexFormat(NUM_COMPS_TO_INTERNAL_FORMAT[_numComponents - 1]), _sampler);
 	}
 
-	Texture2D * Texture2D::create(int _width, int _height, TexFormat _format, const Sampler & _sampler)
-	{
+	Texture2D *Texture2D::create(int _width, int _height, TexFormat _format, const Sampler &_sampler) {
 		return new Texture2D(_width, _height, _format, _sampler);
 	}
 
-	void Texture2D::fillMipMap(int _level, const uint8_t* _data, bool _srgb)
-	{
+	void Texture2D::fillMipMap(int _level, const uint8_t *_data) {
 		glCall(glBindTexture, GL_TEXTURE_2D, m_textureID);
 		int divider = 1 << _level;
 		int levelWidth = glm::max(1, m_width / divider);
@@ -177,33 +158,34 @@ namespace graphics {
 		glCall(glTexSubImage2D, GL_TEXTURE_2D, _level, 0, 0, levelWidth, levelHeight, formatToDataFormat(m_format), GL_UNSIGNED_BYTE, _data);
 	}
 
-	Texture2D::Handle Texture2D::finalize(bool _createMipMaps, bool _makeResident)
-	{
-		if(_createMipMaps)
+	Texture2D::Handle Texture2D::finalize(bool _createMipMaps, bool _makeResident) {
+		if (_createMipMaps)
 			glCall(glGenerateTextureMipmap, m_textureID);
 
-		if(_makeResident)
-		{
-			if ( !GLEW_ARB_bindless_texture ) 
-			{
+		if (_makeResident) {
+			if (!GLEW_ARB_bindless_texture) {
 				spdlog::warn("bindless Texture is not supported from this GPU");
-			}
-			else
-			{
-				m_bindlessHandle 
-					= glCall(glGetTextureSamplerHandleARB, m_textureID, m_sampler->getID());
+			} else {
+				m_bindlessHandle = glCall(glGetTextureSamplerHandleARB, m_textureID, m_sampler->getID());
 				glCall(glMakeTextureHandleResidentARB, m_bindlessHandle);
 			}
 		}
 		return this;
 	}
 
-	void Texture2D::bind(unsigned _slot) const
-	{
+	void Texture2D::bind(unsigned _slot) const {
 		// TODO: check binding to avoid rebinds
 		glCall(glActiveTexture, GL_TEXTURE0 + _slot);
 		glCall(glBindTexture, GL_TEXTURE_2D, m_textureID);
 		m_sampler->bind(_slot);
+	}
+
+	void Texture2D::fillMipMapFloat(int _level, const float *_data) {
+		glCall(glBindTexture, GL_TEXTURE_2D, m_textureID);
+		int divider = 1 << _level;
+		int levelWidth = glm::max(1, m_width / divider);
+		int levelHeight = glm::max(1, m_height / divider);
+		glCall(glTexSubImage2D, GL_TEXTURE_2D, _level, 0, 0, levelWidth, levelHeight, formatToDataFormat(m_format), GL_FLOAT, _data);
 	}
 
 	/*TextureAtlas::TextureAtlas(int _maxWidth, int _maxHeight) :
@@ -289,4 +271,4 @@ namespace graphics {
 		}
 	}*/
 
-} // namespace graphics
+}// namespace graphics

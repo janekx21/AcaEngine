@@ -30,6 +30,7 @@ namespace graphics {
 			instance.texture.bind(textureBindLocation);
 			program.setUniform(albedoTextureLocation, textureBindLocation);
 			program.setUniform(modelMatrixLocation, instance.transform);
+			program.setUniform(program.getUniformLoc("view_matrix"), _camera.getView());
 			program.setUniform(mvpMatrixLocation, _camera.getViewProjection() * instance.transform);
 			instance.mesh.draw();
 		}

@@ -84,7 +84,8 @@ namespace graphics {
 		/// Upload information for a single texture layer
 		/// \param [in] _level Mip-map level starting with 0 for the higest resolution.
 		/// \param [in] _data Pixel data with 8-bit per component and N components per pixel.
-		void fillMipMap(int _level, const uint8_t* _data, bool _srgb = false);
+		void fillMipMap(int _level, const uint8_t* _data);
+		void fillMipMapFloat(int _level, const float* _data);
 		/// Makes the texture resident and may compute mip-maps.
 		Handle finalize(bool _createMipMaps = false, bool _makeResident = true);
 
