@@ -20,6 +20,8 @@ namespace game {
 		graphics::Camera camera;
 		graphics::MeshRenderer meshRenderer;
 		graphics::Mesh scene;
+		graphics::Mesh quad;
+		graphics::Program program;
 		graphics::Texture2D::Handle white;
 		bool shouldFinish = false;
 		graphics::FrameBuffer backBuffer;
