@@ -1,6 +1,6 @@
 #version 450
 
-#define KERNEL_SIZE 8
+#define KERNEL_SIZE 64
 
 layout(location = 0) in vec2 in_texCoord;
 
@@ -20,25 +20,23 @@ const vec2 noiseScale = vec2(1366.0/8.0, 768.0/8.0);
 void main()
 {
 	vec3 albedo = texture(color_texture, in_texCoord).rgb;
-	// float depth = texture(depth_texture, in_texCoord).r;
 	vec3 normal = texture(normal_texture, in_texCoord).xyz;
 	vec3 position = texture(position_texture, in_texCoord).xyz;
 	vec3 randomVector = texture(noise_texture, in_texCoord * noiseScale).xyz;
-
-	// randomVector = vec3(1, 0, 0);
 
 	vec3 tangent = normalize(randomVector - normal * dot(randomVector, normal));
 	vec3 bitangent = cross(normal, tangent);
 	mat3 TBN = mat3(tangent, bitangent, normal);
 
 	float bias = .025;
-	float radius = .5;
+	float radius = 2;
 
 	float occlusion = 0.0;
 	for(int i = 0; i < KERNEL_SIZE; i++)
 	{
 		// get sample position
-		vec3 samplePosition = TBN * samples[i];// from tangent to view-space
+		vec3 s = samples[i];
+		vec3 samplePosition = TBN * s;// from tangent to view-space
 		samplePosition = position + samplePosition * radius;
 
 		vec4 offset = vec4(samplePosition, 1.0);
@@ -53,7 +51,8 @@ void main()
 		// occlusion += (sampleDepth >= samplePosition.z + bias ? 1.0 : 0.0) * rangeCheck;
 	}
 
-	out_color = vec4(vec3(1.0 - (occlusion / KERNEL_SIZE)), 1);
+	float ao = 1.0 - (occlusion / KERNEL_SIZE);
+	out_color = vec4(albedo * mix(1, ao, .6), 1);
 	// out_color = vec4(TBN * vec3(0,0,1), 1);
 	// out_color = vec4(vec3(position), 1);
 	// out_color = vec4(randomVector * .5 + .5, 1);
