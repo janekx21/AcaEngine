@@ -5,8 +5,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <numbers>
+#include "engine/input/inputmanager.hpp"
+#include "engine/graphics/camera.hpp"
 
 void game::Shooter::update(float _time, float _deltaTime) {
+	//ToDo: destroy planets if far away
 	//ToDo: spawn crates  
 	if (counter_time >= 1.0) {
 		counter_time = 0.0;
@@ -31,38 +34,24 @@ void game::Shooter::update(float _time, float _deltaTime) {
 	}
 	counter_time += _deltaTime;
 	
-	
-	//update position
-	registry.execute<Number, Velocity, Transform/*, AngularVelocity*/>([&](Number& _number, Velocity& _velocity, Transform& _transform/*, AngularVelocity& _angularVelocity*/) {
-		//std::cout << "pos" << _transform.position.x << "\n";		
-		//std::cout << "vel" << _velocity.velocity.x << "\n";	
+	game::Actions::UpdateCratePosition(registry, _deltaTime);
+	game::Actions::UpdateRotation(registry, _deltaTime);
 
-		if (_transform.position.x >= 10) {
-			
-			_velocity.velocity.x = -_velocity.velocity.x;
+	if (input::InputManager::isButtonPressed(input::MouseButton::LEFT)) {
+		planets.push_back(registry.create());
+		registry.addComponent<Mesh>(planets[planets.size() - 1], &mesh_planet);
+		registry.addComponent<Texture>(planets[planets.size() - 1], texture_planet);
+		registry.addComponent<Transform>(planets[planets.size() - 1], glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(0, 0, 40));
+		int speeed = 10;
+		registry.addComponent<Velocity>(planets[planets.size() - 1], glm::vec3(camera.toWorldSpace(input::InputManager::getCursorPos()).x*speeed, camera.toWorldSpace(input::InputManager::getCursorPos()).y*speeed, -speeed));
+		registry.addComponent<Visibility>(planets[planets.size() - 1], true);
+		registry.addComponent<AngularVelocity>(planets[planets.size() - 1], glm::quat(glm::vec3(std::rand() % 360 - 180, std::rand() % 360 - 180, std::rand() % 360 - 180)));
+		registry.addComponent<ObjectType>(planets[planets.size() - 1], 1);
 
-		}
-		
-		if (_transform.position.x <= -10){
-			_velocity.velocity.x = -_velocity.velocity.x;
-		}
-		//std::cout << "pos" << _transform.position.y << "\n";
-		//std::cout << "vel" << _velocity.velocity.y << "\n";
-		if (_transform.position.y >= 10 || _transform.position.y <= -10) {
-			_velocity.velocity.y = -_velocity.velocity.y;
-		}
-		//std::cout << "pos" << _transform.position.z << "\n";
-		//std::cout << "vel" << _velocity.velocity.z << "\n";
-		if (_transform.position.z >= 10 || _transform.position.z <= -10) {
-			_velocity.velocity.z = -_velocity.velocity.z;
-		}
-		std::cout << "pre pos: " << _transform.position.x << "/" <<  _transform.position.y << "/" << _transform.position.z << " vel: " << _velocity.velocity.x << "/" << _velocity.velocity.y << "/" << _velocity.velocity.z << "\n";
-		_transform.position.x += _velocity.velocity.x * _deltaTime ;
-		_transform.position.y += _velocity.velocity.y * _deltaTime ;
-		_transform.position.z += _velocity.velocity.z * _deltaTime ;
-		std::cout << "after pos: " << _transform.position.x << "/" << _transform.position.y << "/" << _transform.position.z << "\n";
-		//_transform.rotation *= glm::quat(1, _angularVelocity.velocity * std::numbers::pi, _angularVelocity.velocity * std::numbers::pi, _angularVelocity.velocity * std::numbers::pi);
-		});
+
+
+	}
+
 
 
 
@@ -84,7 +73,7 @@ game::Shooter::Shooter() :			game::GameState(),
 									registry() {
 	counter_time = 1.0;
 	counter_boxes = 0;
-	number_boxes = 10;
+	number_boxes = 100;
 	auto _mesh_planet = &mesh_planet;
 	auto _mesh_box = &mesh_box;
 	auto sampler = graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
@@ -98,21 +87,21 @@ game::Shooter::Shooter() :			game::GameState(),
 	
 	for (int i = 0; i < number_boxes; i++) {
 		boxes.push_back(registry.create());
-		registry.addComponent<Visibility>(boxes[i], false);		
+		registry.addComponent<Visibility>(boxes[i], true);		
 		registry.addComponent<Mesh>(boxes[i], _mesh_box);
 		registry.addComponent<Velocity>(boxes[i], glm::vec3(std::rand() % 6 - 3, std::rand() % 6 - 3, std::rand() % 6 - 3));
 		registry.addComponent<Texture>(boxes[i], texture_box);
-		registry.addComponent<Transform>(boxes[i], glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(std::rand()%20 -10, std::rand() % 20 -10, std::rand() % 20 - 10));
+		registry.addComponent<Transform>(boxes[i], glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(std::rand()%70 -35, std::rand() % 50 -25, std::rand() % 50 - 25));		
+		registry.addComponent<Number>(boxes[i], i);		
+		registry.addComponent<AngularVelocity>(boxes[i], glm::quat(glm::vec3(std::rand()%360 - 180, std::rand() % 360 - 180,std::rand() % 360 - 180)));
+		registry.addComponent<ObjectType>(boxes[i], 0);
 		
-		registry.addComponent<Number>(boxes[i], i);
-		
-		//registry.addComponent<AngularVelocity>(boxes[i], std::rand() % 10 / 10);
-		//
 	}
+	
 	
 
 
-	camera.setView(glm::translate(glm::vec3(0, -5, -20)));
+	camera.setView(glm::translate(glm::vec3(0, 0, -40)));
 }
 
 bool game::Shooter::getIsFinished() {

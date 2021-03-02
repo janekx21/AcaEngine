@@ -25,13 +25,16 @@ struct Velocity {
 	
 };
 struct AngularVelocity {
-	float velocity; 
+	glm::quat angularVelocity; 
 };
 struct Visibility {
 	bool visible;
 };
 struct Number {
 	int number;
+};
+struct ObjectType {
+	int type; //0 - box | 1 - planet
 };
 
 
