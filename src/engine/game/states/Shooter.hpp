@@ -32,6 +32,7 @@ namespace game {
 		int number_boxes;
 		float counter_time;
 		int counter_boxes;
+		int color;
 		
 	};
 }

@@ -13,7 +13,8 @@
 
 
 void game::Shooter::update(float _time, float _deltaTime) {
-	std::srand(_time);
+	color++;
+	glClearColor((color%300 < 100 ) ? color % 300 /100.f : 0, (color % 300 < 200 && color % 300 >= 100) ? (color % 300 -100)/ 100.f : 0, (color % 300 >= 200 ) ? (color % 300 - 200) / 100.f : 0, 1);
 	
 	//ToDo: update AABB
 	game::Actions::UpdateAABB(registry, camera);
@@ -24,7 +25,7 @@ void game::Shooter::update(float _time, float _deltaTime) {
 	//ToDo: destroy planets if far away
 	//ToDo: spawning crates  
 	if (counter_time >= 1.0) {
-		glClearColor(std::rand() % 10 / 10.f, std::rand() % 10 / 10.f, std::rand() % 10 / 10.f, 1);
+		
 		
 		counter_time = 0.0;
 		int counter_while = 0;
@@ -100,7 +101,7 @@ game::Shooter::Shooter() :			game::GameState(),
 									registry() {
 	
 	//initialise variables
-
+	color = 0;
 	counter_time = 1.0;
 	counter_boxes = 0;
 	number_boxes = 100;
