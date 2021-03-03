@@ -7,16 +7,31 @@
 #include <numbers>
 #include "engine/input/inputmanager.hpp"
 #include "engine/graphics/camera.hpp"
+#include "engine/utils/containers/octree.hpp"
+#include <GL/glew.h>
+#include <GLFW\glfw3.h>
+
 
 void game::Shooter::update(float _time, float _deltaTime) {
+	std::srand(_time);
+	
+	//ToDo: update AABB
+	game::Actions::UpdateAABB(registry, camera);
+	//ToDo: collisiontest
+	//utils::SparseOctree<Entity, 3, float> Collisiontree;
+
+
 	//ToDo: destroy planets if far away
 	//ToDo: spawning crates  
 	if (counter_time >= 1.0) {
+		glClearColor(std::rand() % 10 / 10.f, std::rand() % 10 / 10.f, std::rand() % 10 / 10.f, 1);
+		
 		counter_time = 0.0;
 		int counter_while = 0;
 		while (true) {
 			counter_while++;
 			if (counter_while > number_boxes){
+			
 				break;
 			}
 			bool& visible = registry.getComponentUnsafe<Visibility>(boxes[counter_boxes]).visible;
@@ -37,6 +52,8 @@ void game::Shooter::update(float _time, float _deltaTime) {
 	game::Actions::UpdateCratePosition(registry, _deltaTime);
 	game::Actions::UpdateRotation(registry, _deltaTime);
 
+		
+	
 	//spawning planets acurrate
 	if (input::InputManager::isButtonPressed(input::MouseButton::LEFT)) {
 		planets.push_back(registry.create());
@@ -50,7 +67,7 @@ void game::Shooter::update(float _time, float _deltaTime) {
 		registry.addComponent<ObjectType>(planets[planets.size() - 1], 1);
 	}
 	//spawning planets spray
-	if (input::InputManager::isButtonPressed(input::MouseButton::RIGHT)) {		
+	if (input::InputManager::isButtonPressed(input::MouseButton::RIGHT)) {
 		planets.push_back(registry.create());
 		registry.addComponent<Mesh>(planets[planets.size() - 1], &mesh_planet);
 		registry.addComponent<Texture>(planets[planets.size() - 1], texture_planet);
@@ -81,6 +98,9 @@ game::Shooter::Shooter() :			game::GameState(),
 									mesh_box(graphics::Mesh("models/crate.obj")),
 									meshRenderer(),
 									registry() {
+	
+	//initialise variables
+
 	counter_time = 1.0;
 	counter_boxes = 0;
 	number_boxes = 100;
@@ -90,11 +110,10 @@ game::Shooter::Shooter() :			game::GameState(),
 		graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
 	texture_planet = graphics::Texture2D::load("../resources/textures/planet1.png", sampler, false);
 	texture_box = graphics::Texture2D::load("../resources/textures/cratetex.png", sampler, false);
-	//create starting ammount of boxes
-
-	std::srand(666);
 
 	
+	std::srand(666);
+	//create boxes	
 	for (int i = 0; i < number_boxes; i++) {
 		boxes.push_back(registry.create());
 		registry.addComponent<Visibility>(boxes[i], true);		
@@ -105,7 +124,7 @@ game::Shooter::Shooter() :			game::GameState(),
 		registry.addComponent<Number>(boxes[i], i);		
 		registry.addComponent<AngularVelocity>(boxes[i], glm::quat(glm::vec3(std::rand()%360 - 180, std::rand() % 360 - 180,std::rand() % 360 - 180)));
 		registry.addComponent<ObjectType>(boxes[i], 0);
-		
+		game::Actions::AddAABB(registry, boxes[i], "models/sphere.obj", camera);		
 	}
 	
 	

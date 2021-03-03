@@ -17,6 +17,7 @@ namespace game {
 		void draw(float _time, float _deltaTime) override;
 		bool getIsFinished() override;
 
+
 	private:
 		Registry registry;
 		graphics::Camera camera;
@@ -31,5 +32,6 @@ namespace game {
 		int number_boxes;
 		float counter_time;
 		int counter_boxes;
+		
 	};
 }

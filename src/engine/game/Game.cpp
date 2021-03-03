@@ -49,9 +49,10 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 		glfwPollEvents();
 		input::InputManager::update();
 		current.update(time.count(), dt.count());
-
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		current.draw(time.count(), dt.count());
+		
 		glfwSwapBuffers(graphics::Device::getWindow());
 
 		while (current.getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {

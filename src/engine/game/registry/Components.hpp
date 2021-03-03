@@ -4,6 +4,7 @@
 #include<glm/gtc/quaternion.hpp>
 #include <engine/graphics/core/texture.hpp>
 #include <engine/graphics/renderer/mesh.hpp>
+#include <engine/math/geometrictypes.hpp>
 
 
 //Render Components:
@@ -35,6 +36,11 @@ struct Number {
 };
 struct ObjectType {
 	int type; //0 = box = target| 1 = planet = projectile
+};
+struct AABB {
+	math::AABB<3> untransformed_box;
+	math::AABB<3> transformed_box;
+	bool projectile;
 };
 
 
