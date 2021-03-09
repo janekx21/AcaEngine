@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 #include "engine/utils/meshloader.hpp"
-
+#include "engine/utils/containers/octree.hpp"
+#include <set>
 namespace game {
 	class Actions {
 	public:
@@ -44,9 +45,9 @@ namespace game {
 				_transform.position.z += _velocity.velocity.z * _deltaTime;
 				});
 		}
-		static void AddAABB(Registry& _registry, Entity& _ent, const std::string& _path, graphics::Camera& _camera) {
+		static void AddAABB(Registry& _registry, Entity& _ent, const std::string& _path, graphics::Camera& _camera, bool _projectile) {
 			Transform& transdata = _registry.getComponentUnsafe<Transform>(_ent);
-			glm::mat4 transmat = glm::scale(glm::translate(glm::mat4(1), transdata.position) * glm::toMat4(transdata.rotation), transdata.scale);
+			glm::mat4 transmat = glm::translate(glm::mat4(1), transdata.position) * glm::toMat4(transdata.rotation);
 			glm::vec3 min;
 			glm::vec3 max;
 
@@ -102,7 +103,7 @@ namespace game {
 					max_trans.z = transface.z;
 				}				
 			}			
-			_registry.addComponent<AABB>(_ent, math::AABB<3>(min, max), math::AABB<3>(min_trans, max_trans), 0);
+			_registry.addComponent<AABB>(_ent, math::AABB<3>(min, max), math::AABB<3>(min_trans, max_trans), _projectile);
 		}
 		static void UpdateAABB(Registry& _registry, graphics::Camera& _camera) {
 			_registry.execute<Transform, AABB>([&](Transform& _transform, AABB& _aabb) {
@@ -116,7 +117,7 @@ namespace game {
 				box.push_back(glm::vec3(_aabb.untransformed_box.max.x, _aabb.untransformed_box.max.y, _aabb.untransformed_box.min.z));
 				box.push_back(glm::vec3(_aabb.untransformed_box.max.x, _aabb.untransformed_box.max.y, _aabb.untransformed_box.max.z));
 
-				glm::mat4 transmat = glm::scale(glm::translate(glm::mat4(1), _transform.position) * glm::toMat4(_transform.rotation), _transform.scale);
+				glm::mat4 transmat = glm::translate(glm::mat4(1), _transform.position) * glm::toMat4(_transform.rotation);
 
 				glm::vec3 min = glm::vec3(_camera.getViewProjection() * transmat * glm::vec4(box[0], 1));
 				glm::vec3 max = glm::vec3(_camera.getViewProjection() * transmat * glm::vec4(box[0], 1));
@@ -125,29 +126,61 @@ namespace game {
 
 				for (auto& vec : box) {
 					transvec = glm::vec3(_camera.getViewProjection() * transmat * glm::vec4(vec, 1));
-					if (min.x > vec.x) {
-						min.x = vec.x;
+					if (min.x > transvec.x) {
+						min.x = transvec.x;
 					}
-					if (min.y > vec.y) {
-						min.y = vec.y;
+					if (min.y > transvec.y) {
+						min.y = transvec.y;
 					}
-					if (min.z > vec.z) {
-						min.z = vec.z;
+					if (min.z > transvec.z) {
+						min.z = transvec.z;
 					}
-					if (max.x < vec.x) {
-						max.x = vec.x;
+					if (max.x < transvec.x) {
+						max.x = transvec.x;
 					}
-					if (max.y < vec.y) {
-						max.y = vec.y;
+					if (max.y < transvec.y) {
+						max.y = transvec.y;
 					}
-					if (max.z < vec.z) {
-						max.z = vec.z;
+					if (max.z < transvec.z) {
+						max.z = transvec.z;
 					}
 				}
+
 				_aabb.transformed_box.min = min;
 				_aabb.transformed_box.max = max;
 
 				});
+		}
+		static int CollisionCheck(Registry& _registry) {
+			utils::SparseOctree<Entity, 3, float> Collisiontree;
+			_registry.execute<Entity, AABB>([&](Entity& _ent, AABB& _aabb) {
+				if (!_aabb.projectile) {
+					Collisiontree.insert(_aabb.transformed_box, _ent);
+				}				
+			});
+			std::set<Entity> hitsSet;
+			_registry.execute<AABB>([&](AABB& _aabb) {
+
+				if (_aabb.projectile) {
+					utils::SparseOctree<Entity, 3, float>::AABBQuery projectileQuery(_aabb.transformed_box);
+					Collisiontree.traverse(projectileQuery);
+					for (int i = 0; i < projectileQuery.hits.size(); i++) {
+						hitsSet.insert(projectileQuery.hits[i]);
+					}
+				}
+			});
+			for (auto element : hitsSet) {
+				_registry.erase(element);
+			}
+			return hitsSet.size();
+		}
+		static void deleteFarAwayPlanets(Registry& _registry, int& _renderdistance /*actually dependant on cameraposition*/) {
+			_registry.execute<Entity, Transform>([&](Entity& _ent, Transform& _transform) {
+				if (_transform.position.z <= -_renderdistance ) {
+					_registry.erase(_ent);
+				}
+
+			});
 		}
 
 	};
