@@ -30,6 +30,7 @@ namespace game {
 		graphics::Texture2D::Handle texture_planet;
 		graphics::Texture2D::Handle texture_box;
 
+		
 		float counter_time;
 		int counter_boxes;
 		int renderdistance = 500;

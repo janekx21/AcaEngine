@@ -37,7 +37,6 @@ void game::Shooter::update(float _time, float _deltaTime) {
 void game::Shooter::draw(float _time, float _deltaTime) {
 	meshRenderer.clear();
 	game::Actions::Draw(meshRenderer, registry);
-
 	meshRenderer.present(camera);
 }
 
@@ -55,7 +54,7 @@ game::Shooter::Shooter() :			game::GameState(),
 		graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
 	texture_planet = graphics::Texture2D::load("../resources/textures/planet1.png", sampler, false);
 	texture_box = graphics::Texture2D::load("../resources/textures/cratetex.png", sampler, false);	
-	camera.setView(glm::translate(glm::vec3(0, 0, -40)));
+	camera.setView(glm::translate(glm::vec3(0, 0, -40)));	
 }
 
 bool game::Shooter::getIsFinished() {
@@ -77,14 +76,13 @@ void game::Shooter::addBox() {
 	}	
 }
 
-void game::Shooter::addPlanet(bool random)
-{
+void game::Shooter::addPlanet(bool _spray){
+	int speeed = 100;
 	Entity ent = registry.create();
 	registry.addComponent<Mesh>(ent, &mesh_planet);
 	registry.addComponent<Texture>(ent, texture_planet);
 	registry.addComponent<Transform>(ent, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(0, 0, 40));
-	int speeed = 100;
-	if(random){
+	if(_spray){
 		registry.addComponent<Velocity>(ent, glm::vec3(camera.toWorldSpace(input::InputManager::getCursorPos()).x * speeed + (std::rand() % (2*speeed) - speeed)/10 , camera.toWorldSpace(input::InputManager::getCursorPos()).y * speeed + (std::rand() % (2 * speeed) - speeed)/10, -speeed));
 	}
 	else {
@@ -94,5 +92,6 @@ void game::Shooter::addPlanet(bool random)
 	registry.addComponent<Visibility>(ent, true);
 	registry.addComponent<AngularVelocity>(ent, glm::quat(glm::vec3(std::rand() % 360 - 180, std::rand() % 360 - 180, std::rand() % 360 - 180)));
 	registry.addComponent<ObjectType>(ent, 1);
+
 	game::Actions::AddAABB(registry, ent, "models/sphere.obj", camera, true);
 }

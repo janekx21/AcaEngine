@@ -6,6 +6,7 @@
 #include <vector>
 #include "engine/utils/meshloader.hpp"
 #include "engine/utils/containers/octree.hpp"
+#include "engine/input/inputmanager.hpp"
 #include <set>
 
 namespace game {
@@ -182,6 +183,30 @@ namespace game {
 					_registry.erase(_ent);
 				}
 			});
+		}
+
+		static void cameraMovement(glm::vec3& _pos, float& _rot, float _deltaTime, graphics::Camera& _camera, glm::vec3 _cameraStartPosition) {
+			if (input::InputManager::isKeyPressed(input::Key::A)) {
+				_pos.x -= _deltaTime * 5;
+			}
+			if (input::InputManager::isKeyPressed(input::Key::D)) {
+				_pos.x += _deltaTime * 5;
+			}
+			if (input::InputManager::isKeyPressed(input::Key::W)) {
+				_pos.z -= _deltaTime * 5;
+			}
+			if (input::InputManager::isKeyPressed(input::Key::S)) {
+				_pos.z += _deltaTime * 5;
+			}
+			if (input::InputManager::isKeyPressed(input::Key::Q)) {
+				_rot -= _deltaTime;
+			}
+			if (input::InputManager::isKeyPressed(input::Key::E)) {
+				_rot += _deltaTime;
+			}
+			auto location = _cameraStartPosition + _pos;
+			auto rotation = glm::quat(glm::vec3(0, glm::radians(0.0) + _rot * .5, 0));
+			_camera.setView(glm::translate(-location) * glm::toMat4(rotation));
 		}
 	};
 }

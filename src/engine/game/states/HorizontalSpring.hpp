@@ -16,13 +16,18 @@ namespace game {
 		void update(float _time, float _deltaTime) override;
 		void draw(float _time, float _deltaTime) override;
 		bool getIsFinished() override;
+		
 
 	private:
 		Registry registry;
 		graphics::Camera camera;
 		graphics::MeshRenderer meshRenderer;
 		graphics::Mesh mesh;
-		graphics::Texture2D::Handle texture;
-		
+		graphics::Texture2D::Handle texture;		
+		glm::vec3 pos;
+		glm::vec3 cameraStartPosition;
+		float rot;
+
+		void createPlanet(int i);
 	};
 }
