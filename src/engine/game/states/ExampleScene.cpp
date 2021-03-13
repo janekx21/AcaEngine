@@ -18,6 +18,10 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 																		 backBuffer() {
 	auto sampler = graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
 																	 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
+
+	linear = new graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
+														 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
+
 	white = graphics::Texture2D::load("../resources/textures/white.png", sampler, false);
 
 	auto location = glm::vec3(-.5, .6, 1.33);
@@ -26,10 +30,13 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 
 	auto size = graphics::Device::getBufferSize();
 
-	depthTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::D32F, sampler);
-	colorTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGB8, sampler);
-	normalTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGBA16F, sampler);
-	positionTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGBA16F, sampler);
+	depthTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::D32F, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
+																																																					graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
+	colorTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGB8, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
+																																																					graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
+	normalTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGBA16F, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
+																																																							graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
+	positionTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGBA16F, *linear);
 	backBuffer.attachDepth(*depthTexture, 0);
 	backBuffer.attach(0, *colorTexture, 0);
 	backBuffer.attach(1, *normalTexture, 0);

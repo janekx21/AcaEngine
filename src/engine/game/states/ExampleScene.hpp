@@ -28,6 +28,8 @@ namespace game {
 		float rot;
 
 		// partial deferred rendering
+		graphics::Sampler *linear;
+
 		graphics::FrameBuffer backBuffer;
 		graphics::Texture2D *positionTexture;
 		graphics::Texture2D *normalTexture;
