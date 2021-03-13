@@ -7,6 +7,7 @@
 #include "engine/utils/meshloader.hpp"
 #include "engine/utils/containers/octree.hpp"
 #include <set>
+
 namespace game {
 	class Actions {
 	public:
@@ -15,7 +16,6 @@ namespace game {
 				if (_visibility.visible==true) {
 					_meshRenderer.draw(*_mesh.mesh, *_texture.texture, glm::scale(glm::translate(glm::mat4(1), _transform.position) * glm::toMat4(_transform.rotation), _transform.scale));
 				}
-
 			}); 
 		}
 
@@ -24,6 +24,7 @@ namespace game {
 				_transform.rotation = glm::slerp(_transform.rotation, _transform.rotation * _angularVelocity.angularVelocity, _deltaTime/5);
 				});
 		}
+
 		static void UpdateCratePosition(Registry& _registry, float _deltaTime) {
 			_registry.execute<Velocity, Transform, ObjectType>([&](Velocity& _velocity, Transform& _transform, ObjectType& _objectType) {
 				if (_objectType.type == 0) {
@@ -37,14 +38,13 @@ namespace game {
 					if (_transform.position.z >= 25 || _transform.position.z <= -25) {
 						_velocity.velocity.z = -_velocity.velocity.z;
 					}
-
 				}
-
 				_transform.position.x += _velocity.velocity.x * _deltaTime;
 				_transform.position.y += _velocity.velocity.y * _deltaTime;
 				_transform.position.z += _velocity.velocity.z * _deltaTime;
 				});
 		}
+
 		static void AddAABB(Registry& _registry, Entity& _ent, const std::string& _path, graphics::Camera& _camera, bool _projectile) {
 			Transform& transdata = _registry.getComponentUnsafe<Transform>(_ent);
 			glm::mat4 transmat = glm::translate(glm::mat4(1), transdata.position) * glm::toMat4(transdata.rotation);
@@ -105,6 +105,7 @@ namespace game {
 			}			
 			_registry.addComponent<AABB>(_ent, math::AABB<3>(min, max), math::AABB<3>(min_trans, max_trans), _projectile);
 		}
+
 		static void UpdateAABB(Registry& _registry, graphics::Camera& _camera) {
 			_registry.execute<Transform, AABB>([&](Transform& _transform, AABB& _aabb) {
 				std::vector<glm::vec3> box;
@@ -174,22 +175,13 @@ namespace game {
 			}
 			return hitsSet.size();
 		}
+
 		static void deleteFarAwayPlanets(Registry& _registry, int& _renderdistance /*actually dependant on cameraposition*/) {
 			_registry.execute<Entity, Transform>([&](Entity& _ent, Transform& _transform) {
 				if (_transform.position.z <= -_renderdistance ) {
 					_registry.erase(_ent);
 				}
-
 			});
 		}
-
 	};
-	
-	/*class Physics {
-		Update(float _time, float _deltaTime) {
-
-		}
-	public:
-	private:
-	};*/
 }
