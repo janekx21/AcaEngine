@@ -8,28 +8,29 @@
 #include "engine/input/inputmanager.hpp"
 #include "engine/graphics/camera.hpp"
 
-void game::Shooter::update(float _time, float _deltaTime) {	
-	//ToDo: update AABB
+void game::Shooter::update(float _time, float _deltaTime) {
 	game::Actions::UpdateAABB(registry, camera);
-	//ToDo: collisiontest	
+
 	counter_boxes -= game::Actions::CollisionCheck(registry);
-	//ToDo: destroy planets if far away
+
 	game::Actions::deleteFarAwayPlanets(registry, renderdistance);
-	//ToDo: spawning crates  
-	if (counter_time >= 0.005) {		
+	// spawning crates  
+	if (counter_time >= 0.05) {
 		counter_time = 0.0;
-		game::Shooter::addBox();		
+		game::Shooter::addBox();
 	}
 	counter_time += _deltaTime;
-	
+
 	game::Actions::UpdateCratePosition(registry, _deltaTime);
 	game::Actions::UpdateRotation(registry, _deltaTime);
-		
-	//spawning planets acurrate
+
+	// spawning planets acurrate
 	if (input::InputManager::isButtonPressed(input::MouseButton::LEFT)) {
-	//spawning planets spray
+		game::Shooter::addPlanet(false);
+	}
+	// spawning planets spray
 	if (input::InputManager::isButtonPressed(input::MouseButton::RIGHT)) {
-		game::Shooter::addPlanet(true);		
+		game::Shooter::addPlanet(true);
 	}
 }
 
