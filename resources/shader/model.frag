@@ -2,7 +2,7 @@
 
 layout(location = 0) in vec3 in_normal;
 layout(location = 1) in vec2 in_texCoord;
-layout(location = 2) in vec4 in_position;
+layout(location = 2) in vec3 in_position;
 
 layout(binding = 0) uniform sampler2D albedo_texture;
 
@@ -21,5 +21,5 @@ void main()
 	float light = diffuse + ambient;
 	out_color = vec4(albedo * light, 1);
 	out_normal = vec4(in_normal, 1);
-	out_position = in_position;
+	out_position = vec4(in_position, 1);
 }

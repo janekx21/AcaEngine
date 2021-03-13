@@ -54,9 +54,10 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 						random01(generator));
 
 		sample = glm::normalize(sample);
-		// auto scale = (float) i / 64.0f;
-		// scale = lerp(.1f, 1.f, scale * scale);
-		// sample *= random01(generator) * scale;
+		sample *= random01(generator);
+		auto scale = static_cast<float>(i) / static_cast<float>(SAMPLE_SIZE);
+		scale = lerp(.1f, 1.f, scale * scale);
+		sample *= scale;
 		sampleList.push_back(sample);
 	}
 
@@ -72,7 +73,7 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 	}
 
 	auto repeatSampler = graphics::Sampler(graphics::Sampler::Filter::POINT, graphics::Sampler::Filter::POINT,
-																				 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::REPEAT);
+																				 graphics::Sampler::Filter::POINT, graphics::Sampler::Border::REPEAT);
 	noiseTexture = graphics::Texture2D::create(NOISE_SIZE, NOISE_SIZE, graphics::TexFormat::RGBA16F, repeatSampler);
 	noiseTexture->fillMipMapFloat(0, (float*)noiseList.data());
 
@@ -141,10 +142,10 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 			program.setUniform(location, slot);
 		}
 		{
-			const auto slot = 3;
-			depthTexture->bind(slot);
-			auto location = program.getUniformLoc("depth_texture");
-			program.setUniform(location, slot);
+			// const auto slot = 3;
+			// depthTexture->bind(slot);
+			// auto location = program.getUniformLoc("depth_texture");
+			// program.setUniform(location, slot);
 		}
 		{
 			const auto slot = 4;

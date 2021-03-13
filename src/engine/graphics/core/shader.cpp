@@ -106,7 +106,11 @@ namespace graphics {
 	}
 
 	int Program::getUniformLoc(const char *_uniformName) {
-		return glCall(glGetUniformLocation, m_programID, _uniformName);
+		int location = glCall(glGetUniformLocation, m_programID, _uniformName);
+		if (location == -1) {
+			spdlog::error("Shader location not found at shader {}", _uniformName);
+		}
+		return location;
 	}
 
 	void Program::setUniform(int _location, float _value) {

@@ -24,12 +24,15 @@ void main()
 	vec3 position = texture(position_texture, in_texCoord).xyz;
 	vec3 randomVector = texture(noise_texture, in_texCoord * noiseScale).xyz;
 
+	// TODO debug
+	randomVector = vec3(1, 0, 0);
+
 	vec3 tangent = normalize(randomVector - normal * dot(randomVector, normal));
 	vec3 bitangent = cross(normal, tangent);
 	mat3 TBN = mat3(tangent, bitangent, normal);
 
 	float bias = .025;
-	float radius = 2;
+	float radius = .2;
 
 	float occlusion = 0.0;
 	for(int i = 0; i < KERNEL_SIZE; i++)
@@ -52,7 +55,7 @@ void main()
 	}
 
 	float ao = 1.0 - (occlusion / KERNEL_SIZE);
-	out_color = vec4(albedo * mix(1, ao, .6), 1);
+	out_color = vec4(albedo * mix(1, ao, .9), 1);
 	// out_color = vec4(TBN * vec3(0,0,1), 1);
 	// out_color = vec4(vec3(position), 1);
 	// out_color = vec4(randomVector * .5 + .5, 1);
