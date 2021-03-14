@@ -16,6 +16,8 @@ namespace game {
 		void update(float _time, float _deltaTime) override;
 		void draw(float _time, float _deltaTime) override;
 		bool getIsFinished() override;
+		bool getIsMenue() override;
+		int goToState() override;
 		
 
 	private:
@@ -27,7 +29,7 @@ namespace game {
 		glm::vec3 pos;
 		glm::vec3 cameraStartPosition;
 		float rot;
-
+		bool isFinished;
 		void createPlanet(int i);
 	};
 }

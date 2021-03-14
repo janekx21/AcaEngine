@@ -7,18 +7,20 @@
 #include <vector>
 #include <engine/game/tests/testutils.hpp>
 #include <engine/game/Game.hpp>
-#include <engine/game/states/HorizontalSpring.hpp>
 #include <engine/game/states/MovingPlanets.hpp>
 #include <engine/game/states/Start.hpp>
 #include <engine/game/states/Shooter.hpp>
+#include <engine/game/states/HorizontalSpring.hpp>
 
 int main()
 {
 	game::Game game;
-	game::Shooter state;
-	//game::HorizontalSpring state;
-	game.run(std::make_unique<game::Shooter>(state));
-	//game.run(std::make_unique<game::HorizontalSpring>(state));
 	
+	game::Start state;
+	//game::HorizontalSpring state;
+	//game::Shooter state;
+	//game.run(std::make_unique<game::Shooter>(state));
+	//game.run(std::make_unique<game::HorizontalSpring>(state));
+	game.run(std::make_unique<game::Start>(state));
 	return EXIT_SUCCESS;
 }

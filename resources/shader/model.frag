@@ -9,7 +9,7 @@ layout(location = 0) out vec4 out_color;
 
 void main()
 {
-	vec3 lightDirection = normalize(vec3(-.8, -.7, -.9));
+	vec3 lightDirection = normalize(vec3(-.5, 0.5, -.5));
 	vec3 albedo = texture(albedo_texture, in_texCoord).rgb;
 
 	float diffuse = max(dot(in_normal, -lightDirection), 0);

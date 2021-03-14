@@ -7,8 +7,16 @@
 #include <numbers>
 #include "engine/input/inputmanager.hpp"
 #include "engine/graphics/camera.hpp"
+#include <chrono>
+#include <GLFW\glfw3.h>
 
 void game::Shooter::update(float _time, float _deltaTime) {
+	float c_value = abs((int(_time ) % 200 - 100) / 100.f);
+	glClearColor(1 - c_value, 0.5, c_value, 1);
+	if (input::InputManager::isKeyPressed(input::Key::ESCAPE)) {
+		isFinished = true;
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	}
 	game::Actions::UpdateAABB(registry, camera);
 
 	counter_boxes -= game::Actions::CollisionCheck(registry);
@@ -47,6 +55,7 @@ game::Shooter::Shooter() :			game::GameState(),
 									meshRenderer(),
 									registry() {	
 	//initialise variables
+	isFinished = false;
 	std::srand(666);
 	counter_time = 0;
 	counter_boxes = 0;	
@@ -58,7 +67,17 @@ game::Shooter::Shooter() :			game::GameState(),
 }
 
 bool game::Shooter::getIsFinished() {
+	return isFinished;
+}
+
+bool game::Shooter::getIsMenue()
+{
 	return false;
+}
+
+int game::Shooter::goToState()
+{
+	return 0;
 }
 
 void game::Shooter::addBox() {
