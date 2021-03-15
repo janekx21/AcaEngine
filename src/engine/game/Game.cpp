@@ -4,13 +4,15 @@
 #include "engine/graphics/core/device.hpp"
 #include "engine/input/inputmanager.hpp"
 #include "engine/utils/meshloader.hpp"
+#include <engine/game/states/Shooter.hpp>
+#include <engine/game/states/HorizontalSpring.hpp>
 
 game::Game::Game() {
 	graphics::Device::initialize(1366, 768, false);
 	GLFWwindow *window = graphics::Device::getWindow();
 	input::InputManager::initialize(window);
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(1.f, 1.f, 1.f, 1);
+	glClearColor(0.8f, 0.8f,0.8f, 1);
 }
 
 game::Game::~Game() {
@@ -23,6 +25,8 @@ game::Game::~Game() {
 }
 
 void game::Game::run(std::unique_ptr<GameState> _initialState) {
+	game::HorizontalSpring horizontalSpring;
+	game::Shooter shooter;
 	using TimePoint = std::chrono::steady_clock::time_point;
 	using Clock = std::chrono::high_resolution_clock;
 	using Duration = std::chrono::duration<float>;
@@ -34,6 +38,7 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 	Duration targetFrameTime = Duration(1.0 / 60.0);
 
 	while (!states.empty()) {
+		
 		auto now = Clock::now();
 		Duration time = now - beginTimePoint;
 		Duration dt = now - previousTimePoint;
@@ -41,24 +46,40 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 			std::this_thread::sleep_for(targetFrameTime - dt);
 		}
 
-		// do { now = Clock::now(); } while (now - previousTimePoint < targetFrameTime);
-		// dt = now - previousTimePoint;
 		previousTimePoint = now;
 
-		GameState &current = *states.back();
 		glfwPollEvents();
 		input::InputManager::update();
-		current.update(time.count(), dt.count());
+		states.back()->update(time.count(), dt.count());
 
+		if (states.back()->goToState() == 1 && states.back()->getIsMenue()) {
+			states.back()->onPause();
+			states.push_back(std::move(std::make_unique<game::HorizontalSpring>(horizontalSpring)));
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
+		if (states.back()->goToState() == 3 && states.back()->getIsMenue()) {
+			states.back()->onPause();
+			states.push_back(std::move(std::make_unique<game::Shooter>(shooter)));
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
+		/*if (states.back()->goToState() == 2 && states.back()->getIsMenue()) {
+			states.back()->onPause();
+			states.push_back(std::move(std::make_unique<game::HorizontalSpring>(state1)));
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}*/
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		current.draw(time.count(), dt.count());
+		states.back()->draw(time.count(), dt.count());
+		
 		glfwSwapBuffers(graphics::Device::getWindow());
 
-		while (current.getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {
-			states.pop_back();
-			if (states.empty()) break;
-			current = *states.back();
-			current.onResume();
+		while (states.back()->getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {
+			states.pop_back();	
+			
+			if (states.empty()) {
+				break;
+			}				
+			states.back()->onResume();
 		}
 	}
 }
