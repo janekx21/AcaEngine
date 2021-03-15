@@ -16,7 +16,7 @@ namespace game {
 		void update(float _time, float _deltaTime) override;
 		void draw(float _time, float _deltaTime) override;
 		bool getIsFinished() override;
-		bool getIsMenue() override;
+		bool getIsMenu() override;
 		int goToState() override;
 		void addBox();
 		void addPlanet(bool random);
@@ -32,9 +32,9 @@ namespace game {
 		graphics::Texture2D::Handle texture_box;
 
 
-		float counter_time;
-		int counter_boxes;
-		int renderdistance = 500;
+		float boxSpawnTimer;
+		int boxCounter;
+		float renderDistance = 500;
 		bool isFinished;
 	};
 }// namespace game

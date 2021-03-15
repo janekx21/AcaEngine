@@ -16,7 +16,7 @@ namespace game {
 		void update(float _time, float _deltaTime) override;
 		void draw(float _time, float _deltaTime) override;
 		bool getIsFinished() override;
-		bool getIsMenue() override;
+		bool getIsMenu() override;
 		int goToState() override;
 
 	private:

@@ -15,15 +15,15 @@ void game::Shooter::update(float _time, float _deltaTime) {
 	}
 	game::Actions::UpdateAABB(registry, camera);
 
-	counter_boxes -= game::Actions::CollisionCheck(registry);
+	boxCounter -= game::Actions::CollisionCheck(registry);
 
-	game::Actions::deleteFarAwayPlanets(registry, renderdistance);
+	game::Actions::deleteFarAwayPlanets(registry, renderDistance);
 	// spawning crates
-	if (counter_time >= 0.05) {
-		counter_time = 0.0;
+	if (boxSpawnTimer >= 0.05) {
+		boxSpawnTimer = 0.0;
 		game::Shooter::addBox();
 	}
-	counter_time += _deltaTime;
+	boxSpawnTimer += _deltaTime;
 
 	game::Actions::UpdateCratePosition(registry, _deltaTime);
 	game::Actions::UpdateRotation(registry, _deltaTime);
@@ -45,7 +45,7 @@ void game::Shooter::draw(float _time, float _deltaTime) {
 }
 
 game::Shooter::Shooter() : game::GameState(),
-													 camera(graphics::Camera(90, 2.f, renderdistance)),
+													 camera(graphics::Camera(90, 2.f, renderDistance)),
 													 mesh_planet(graphics::Mesh("models/sphere.obj")),
 													 mesh_box(graphics::Mesh("models/crate.obj")),
 													 meshRenderer(),
@@ -53,8 +53,8 @@ game::Shooter::Shooter() : game::GameState(),
 	//initialise variables
 	isFinished = false;
 	std::srand(666);
-	counter_time = 0;
-	counter_boxes = 0;
+	boxSpawnTimer = 0;
+	boxCounter = 0;
 	auto sampler = graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
 																	 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
 	texture_planet = graphics::Texture2D::load("../resources/textures/planet1.png", sampler, false);
@@ -66,7 +66,7 @@ bool game::Shooter::getIsFinished() {
 	return isFinished;
 }
 
-bool game::Shooter::getIsMenue() {
+bool game::Shooter::getIsMenu() {
 	return false;
 }
 
@@ -75,7 +75,7 @@ int game::Shooter::goToState() {
 }
 
 void game::Shooter::addBox() {
-	if (counter_boxes <= 1000) {
+	if (boxCounter <= 1000) {
 		Entity ent = registry.create();
 		registry.addComponent<Visibility>(ent, true);
 		registry.addComponent<Mesh>(ent, &mesh_box);
@@ -85,20 +85,20 @@ void game::Shooter::addBox() {
 		registry.addComponent<AngularVelocity>(ent, glm::quat(glm::vec3(std::rand() % 360 - 180, std::rand() % 360 - 180, std::rand() % 360 - 180)));
 		registry.addComponent<ObjectType>(ent, 0);
 		game::Actions::AddAABB(registry, ent, "models/crate.obj", camera, false);
-		counter_boxes++;
+		boxCounter++;
 	}
 }
 
 void game::Shooter::addPlanet(bool _spray) {
-	int speeed = 100;
+	int speed = 100;
 	Entity ent = registry.create();
 	registry.addComponent<Mesh>(ent, &mesh_planet);
 	registry.addComponent<Texture>(ent, texture_planet);
 	registry.addComponent<Transform>(ent, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(0, 0, 40));
 	if (_spray) {
-		registry.addComponent<Velocity>(ent, glm::vec3(camera.toWorldSpace(input::InputManager::getCursorPos()).x * speeed + (std::rand() % (2 * speeed) - speeed) / 10, camera.toWorldSpace(input::InputManager::getCursorPos()).y * speeed + (std::rand() % (2 * speeed) - speeed) / 10, -speeed));
+		registry.addComponent<Velocity>(ent, glm::vec3(camera.toWorldSpace(input::InputManager::getCursorPos()).x * speed + (std::rand() % (2 * speed) - speed) / 10, camera.toWorldSpace(input::InputManager::getCursorPos()).y * speed + (std::rand() % (2 * speed) - speed) / 10, -speed));
 	} else {
-		registry.addComponent<Velocity>(ent, glm::vec3(camera.toWorldSpace(input::InputManager::getCursorPos()).x * speeed, camera.toWorldSpace(input::InputManager::getCursorPos()).y * speeed, -speeed));
+		registry.addComponent<Velocity>(ent, glm::vec3(camera.toWorldSpace(input::InputManager::getCursorPos()).x * speed, camera.toWorldSpace(input::InputManager::getCursorPos()).y * speed, -speed));
 	}
 	registry.addComponent<Visibility>(ent, true);
 	registry.addComponent<AngularVelocity>(ent, glm::quat(glm::vec3(std::rand() % 360 - 180, std::rand() % 360 - 180, std::rand() % 360 - 180)));

@@ -27,8 +27,6 @@ game::Game::~Game() {
 }
 
 void game::Game::run(std::unique_ptr<GameState> _initialState) {
-	game::HorizontalSpring horizontalSpring;
-	game::Shooter shooter;
 	using TimePoint = std::chrono::steady_clock::time_point;
 	using Clock = std::chrono::high_resolution_clock;
 	using Duration = std::chrono::duration<float>;
@@ -40,7 +38,6 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 	Duration targetFrameTime = Duration(1.0 / 60.0);
 
 	while (!states.empty()) {
-
 		auto now = Clock::now();
 		Duration time = now - beginTimePoint;
 		Duration dt = now - previousTimePoint;
@@ -54,17 +51,17 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 		input::InputManager::update();
 		states.back()->update(time.count(), dt.count());
 
-		if (states.back()->goToState() == 1 && states.back()->getIsMenue()) {
+		if (states.back()->goToState() == 1 && states.back()->getIsMenu()) {
 			states.back()->onPause();
-			states.push_back(std::move(std::make_unique<game::HorizontalSpring>(horizontalSpring)));
+			states.push_back(std::move(std::make_unique<game::HorizontalSpring>()));
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		if (states.back()->goToState() == 3 && states.back()->getIsMenue()) {
+		if (states.back()->goToState() == 3 && states.back()->getIsMenu()) {
 			states.back()->onPause();
-			states.push_back(std::move(std::make_unique<game::Shooter>(shooter)));
+			states.push_back(std::move(std::make_unique<game::Shooter>()));
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		if (states.back()->goToState() == 2 && states.back()->getIsMenue()) {
+		if (states.back()->goToState() == 2 && states.back()->getIsMenu()) {
 			states.back()->onPause();
 			states.push_back(std::move(std::make_unique<game::ExampleScene>()));
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));

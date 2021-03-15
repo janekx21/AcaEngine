@@ -69,7 +69,7 @@ bool game::Start::getIsFinished() {
 	return isFinished;
 }
 
-bool game::Start::getIsMenue() {
+bool game::Start::getIsMenu() {
 	return true;
 }
 

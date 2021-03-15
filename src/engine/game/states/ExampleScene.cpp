@@ -146,11 +146,6 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 			program.setUniform(location, slot);
 		}
 		{
-						// const auto slot = 3;
-						// depthTexture->bind(slot);
-						// auto location = program.getUniformLoc("depth_texture");
-						// program.setUniform(location, slot);
-		} {
 			const auto slot = 4;
 			noiseTexture->bind(slot);
 			auto location = program.getUniformLoc("noise_texture");
@@ -166,11 +161,4 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 		meshRenderer.present(camera);
 		meshRenderer.clear();
 	}
-
-
-	/*
-	meshRenderer.draw(scene, *colorTexture, glm::identity<glm::mat4>());
-	meshRenderer.present(camera);
-	meshRenderer.clear();
-	 */
 }

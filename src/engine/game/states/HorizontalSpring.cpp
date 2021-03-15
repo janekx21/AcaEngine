@@ -50,7 +50,7 @@ bool game::HorizontalSpring::getIsFinished() {
 	return isFinished;
 }
 
-bool game::HorizontalSpring::getIsMenue() {
+bool game::HorizontalSpring::getIsMenu() {
 	return false;
 }
 

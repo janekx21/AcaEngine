@@ -15,7 +15,7 @@ namespace game {
 	public:
 		static void Draw(graphics::MeshRenderer &_meshRenderer, Registry &_registry) {
 			_registry.execute<Mesh, Texture, Transform, Visibility>([&](Mesh _mesh, Texture _texture, Transform &_transform, Visibility &_visibility) {
-				if (_visibility.visible == true) {
+				if (_visibility.visible) {
 					_meshRenderer.draw(*_mesh.mesh, *_texture.texture, glm::scale(glm::translate(glm::mat4(1), _transform.position) * glm::toMat4(_transform.rotation), _transform.scale));
 				}
 			});
@@ -48,26 +48,26 @@ namespace game {
 		}
 
 		static void AddAABB(Registry &_registry, Entity &_ent, const std::string &_path, graphics::Camera &_camera, bool _projectile) {
-			Transform &transdata = _registry.getComponentUnsafe<Transform>(_ent);
-			glm::mat4 transmat = glm::translate(glm::mat4(1), transdata.position) * glm::toMat4(transdata.rotation);
+			Transform &transformData = _registry.getComponentUnsafe<Transform>(_ent);
+			glm::mat4 transformMatrix = glm::translate(glm::mat4(1), transformData.position) * glm::toMat4(transformData.rotation);
 			glm::vec3 min;
 			glm::vec3 max;
 
 			glm::vec3 min_trans;
 			glm::vec3 max_trans;
 
-			glm::vec3 transface;
+			glm::vec3 translationFace;
 
 			auto meshData = utils::MeshLoader::get(_path.c_str());
 
 			min = meshData->positions[0];
 			max = meshData->positions[0];
 
-			min_trans = glm::vec3(_camera.getViewProjection() * transmat * glm::vec4(meshData->positions[0], 1));
-			max_trans = glm::vec3(_camera.getViewProjection() * transmat * glm::vec4(meshData->positions[0], 1));
+			min_trans = glm::vec3(_camera.getViewProjection() * transformMatrix * glm::vec4(meshData->positions[0], 1));
+			max_trans = glm::vec3(_camera.getViewProjection() * transformMatrix * glm::vec4(meshData->positions[0], 1));
 
 			for (auto &face : meshData->positions) {
-				transface = glm::vec3(_camera.getViewProjection() * transmat * glm::vec4(face, 1));
+				translationFace = glm::vec3(_camera.getViewProjection() * transformMatrix * glm::vec4(face, 1));
 				if (min.x > face.x) {
 					min.x = face.x;
 				}
@@ -86,23 +86,23 @@ namespace game {
 				if (max.z < face.z) {
 					max.z = face.z;
 				}
-				if (min_trans.x > transface.x) {
-					min_trans.x = transface.x;
+				if (min_trans.x > translationFace.x) {
+					min_trans.x = translationFace.x;
 				}
-				if (min_trans.y > transface.y) {
-					min_trans.y = transface.y;
+				if (min_trans.y > translationFace.y) {
+					min_trans.y = translationFace.y;
 				}
-				if (min_trans.z > transface.z) {
-					min_trans.z = transface.z;
+				if (min_trans.z > translationFace.z) {
+					min_trans.z = translationFace.z;
 				}
-				if (max_trans.x < transface.x) {
-					max_trans.x = transface.x;
+				if (max_trans.x < translationFace.x) {
+					max_trans.x = translationFace.x;
 				}
-				if (max_trans.y < transface.y) {
-					max_trans.y = transface.y;
+				if (max_trans.y < translationFace.y) {
+					max_trans.y = translationFace.y;
 				}
-				if (max_trans.z < transface.z) {
-					max_trans.z = transface.z;
+				if (max_trans.z < translationFace.z) {
+					max_trans.z = translationFace.z;
 				}
 			}
 			_registry.addComponent<AABB>(_ent, math::AABB<3>(min, max), math::AABB<3>(min_trans, max_trans), _projectile);
@@ -120,32 +120,32 @@ namespace game {
 				box.push_back(glm::vec3(_aabb.untransformed_box.max.x, _aabb.untransformed_box.max.y, _aabb.untransformed_box.min.z));
 				box.push_back(glm::vec3(_aabb.untransformed_box.max.x, _aabb.untransformed_box.max.y, _aabb.untransformed_box.max.z));
 
-				glm::mat4 transmat = glm::translate(glm::mat4(1), _transform.position) * glm::toMat4(_transform.rotation);
+				glm::mat4 translationMatrix = glm::translate(glm::mat4(1), _transform.position) * glm::toMat4(_transform.rotation);
 
-				glm::vec3 min = glm::vec3(_camera.getViewProjection() * transmat * glm::vec4(box[0], 1));
-				glm::vec3 max = glm::vec3(_camera.getViewProjection() * transmat * glm::vec4(box[0], 1));
+				glm::vec3 min = glm::vec3(_camera.getViewProjection() * translationMatrix * glm::vec4(box[0], 1));
+				glm::vec3 max = glm::vec3(_camera.getViewProjection() * translationMatrix * glm::vec4(box[0], 1));
 
-				glm::vec3 transvec;
+				glm::vec3 translationFace;
 
 				for (auto &vec : box) {
-					transvec = glm::vec3(_camera.getViewProjection() * transmat * glm::vec4(vec, 1));
-					if (min.x > transvec.x) {
-						min.x = transvec.x;
+					translationFace = glm::vec3(_camera.getViewProjection() * translationMatrix * glm::vec4(vec, 1));
+					if (min.x > translationFace.x) {
+						min.x = translationFace.x;
 					}
-					if (min.y > transvec.y) {
-						min.y = transvec.y;
+					if (min.y > translationFace.y) {
+						min.y = translationFace.y;
 					}
-					if (min.z > transvec.z) {
-						min.z = transvec.z;
+					if (min.z > translationFace.z) {
+						min.z = translationFace.z;
 					}
-					if (max.x < transvec.x) {
-						max.x = transvec.x;
+					if (max.x < translationFace.x) {
+						max.x = translationFace.x;
 					}
-					if (max.y < transvec.y) {
-						max.y = transvec.y;
+					if (max.y < translationFace.y) {
+						max.y = translationFace.y;
 					}
-					if (max.z < transvec.z) {
-						max.z = transvec.z;
+					if (max.z < translationFace.z) {
+						max.z = translationFace.z;
 					}
 				}
 
@@ -154,17 +154,17 @@ namespace game {
 			});
 		}
 		static int CollisionCheck(Registry &_registry) {
-			utils::SparseOctree<Entity, 3, float> Collisiontree;
+			utils::SparseOctree<Entity, 3, float> collisionTree;
 			_registry.execute<Entity, AABB>([&](Entity &_ent, AABB &_aabb) {
 				if (!_aabb.projectile) {
-					Collisiontree.insert(_aabb.transformed_box, _ent);
+					collisionTree.insert(_aabb.transformed_box, _ent);
 				}
 			});
 			std::set<Entity> hitsSet;
 			_registry.execute<AABB>([&](AABB &_aabb) {
 				if (_aabb.projectile) {
 					utils::SparseOctree<Entity, 3, float>::AABBQuery projectileQuery(_aabb.transformed_box);
-					Collisiontree.traverse(projectileQuery);
+					collisionTree.traverse(projectileQuery);
 					for (size_t i = 0; i < projectileQuery.hits.size(); i++) {
 						hitsSet.insert(projectileQuery.hits[i]);
 					}
@@ -176,9 +176,9 @@ namespace game {
 			return hitsSet.size();
 		}
 
-		static void deleteFarAwayPlanets(Registry &_registry, int &_renderdistance /*actually dependant on cameraposition*/) {
+		static void deleteFarAwayPlanets(Registry &_registry, float &_renderDistance /*actually dependant on cameraposition*/) {
 			_registry.execute<Entity, Transform>([&](Entity &_ent, Transform &_transform) {
-				if (_transform.position.z <= -_renderdistance) {
+				if (_transform.position.z <= -_renderDistance) {
 					_registry.erase(_ent);
 				}
 			});
