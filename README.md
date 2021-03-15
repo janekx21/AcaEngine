@@ -1,6 +1,8 @@
 # AcaEngine
 The Acagamics Game Engine Course
 
+## The Game
+
 The game has 4 different states:
  - Starting from the start menue you can reach the other three scenes via button clicking. You can then return to the start menue by pressing escape.
   
