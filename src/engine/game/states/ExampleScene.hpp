@@ -22,6 +22,7 @@ namespace game {
 	private:
 		graphics::Camera camera;
 		graphics::MeshRenderer meshRenderer;
+		graphics::MeshRenderer meshRendererVanilla;
 		graphics::Mesh scene;
 		graphics::Mesh quad;
 		graphics::Program ambientOcclusionProgram;

@@ -87,8 +87,6 @@ namespace graphics {
 		/// Makes the texture resident and may compute mip-maps.
 		Handle finalize(bool _createMipMaps = false, bool _makeResident = true);
 
-		void clear();
-
 		/// Bind 2D texture to given location
 		void bind(unsigned _slot) const;
 

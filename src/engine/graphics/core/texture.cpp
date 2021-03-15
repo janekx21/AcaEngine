@@ -188,10 +188,6 @@ namespace graphics {
 		glCall(glTexSubImage2D, GL_TEXTURE_2D, _level, 0, 0, levelWidth, levelHeight, formatToDataFormat(m_format), GL_FLOAT, _data);
 	}
 
-	void Texture2D::clear() {
-		// glCall(glClearTexImage, m_textureID, 0, static_cast<GLenum>(m_format), formatToDataFormat(m_format), nullptr);
-	}
-
 	/*TextureAtlas::TextureAtlas(int _maxWidth, int _maxHeight) :
 		m_width(_maxWidth),
 		m_height(_maxHeight),

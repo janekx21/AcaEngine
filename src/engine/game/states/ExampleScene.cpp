@@ -12,6 +12,7 @@ float lerp(float a, float b, float f) {
 
 game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 																		 meshRenderer(),
+																		 meshRendererVanilla(),
 																		 scene(graphics::Mesh("models/scene.obj")),
 																		 quad(graphics::Mesh("models/quad.obj")) {
 	white = graphics::Texture2D::load("../resources/textures/white.png", graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP), false);
@@ -109,16 +110,17 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 	camera.setView(glm::translate(-location) * glm::toMat4(rotation));
 
 
-	meshRenderer.draw(scene, *white, glm::identity<glm::mat4>());
 
 	if (!input::InputManager::isKeyPressed(input::Key::SPACE)) {
+		meshRenderer.draw(scene, *white, glm::identity<glm::mat4>());
 
 		ambientOcclusionProgram.setUniform(ambientOcclusionProgram.getUniformLoc("view_matrix"), camera.getView());
 		ambientOcclusionProgram.setUniform(ambientOcclusionProgram.getUniformLoc("projection_matrix"), camera.getProjection());
 		meshRenderer.present(camera);
 		meshRenderer.clear();
 	} else {
-		meshRenderer.present(camera);
-		meshRenderer.clear();
+		meshRendererVanilla.draw(scene, *white, glm::identity<glm::mat4>());
+		meshRendererVanilla.present(camera);
+		meshRendererVanilla.clear();
 	}
 }
