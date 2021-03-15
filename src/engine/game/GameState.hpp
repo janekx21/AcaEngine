@@ -12,6 +12,8 @@ namespace game {
 		virtual void draw(float _time, float _deltaTime) = 0;
 
 		virtual bool getIsFinished() = 0;
+		virtual bool getIsMenue() = 0;
+		virtual int goToState() = 0;
 
 	};
 }

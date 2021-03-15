@@ -1,23 +1,33 @@
 #include "Start.hpp"
 #include <iostream>
+#include <glm/gtx/transform.hpp>
+#include <chrono>
+#include <engine/game/actions/Actions.hpp>
 
 
 
 void game::Start::update(float _time, float _deltaTime)
 {
+	nextState = 0;
+	float c_value = abs((int(_time*20) % 200 -100)/100.f);
+	glClearColor(1 - c_value, 0.5,c_value, 1);
+
 	if (input::InputManager::isKeyPressed(input::Key::ESCAPE)) {
-		end = true;
+		isFinished = true;
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	}
+	
+	glm::vec2 X = glm::vec2(input::InputManager::getCursorPos().x, input::InputManager::getCursorPos().y);
+	if (X.x >= 299 && X.x <= 452 && X.y >= 307 && X.y <= 460 && input::InputManager::isButtonPressed(input::MouseButton::LEFT)) {
+		nextState = 1;
+	}
+	
+	if (X.x >= 606 && X.x <= 759 && X.y >= 307 && X.y <= 460 && input::InputManager::isButtonPressed(input::MouseButton::LEFT)) {
+		nextState = 2;
 	}
 
-	glm::vec2 A = glm::vec2(530, 536);
-	glm::vec2 B = glm::vec2(530, 230);
-	glm::vec2 C = glm::vec2(834, 384);
-	glm::vec2 X = glm::vec2(input::InputManager::getCursorPos().x, input::InputManager::getCursorPos().y);
-
-	// compare Area to see if cursor in green field (area is still hardcoded could be implemented as affine transformation)
-	if (0.5 * abs((B - A).x * (C - A).y - (B - A).y * (C - A).x) >= 0.5 * abs((B - X).x * (C - X).y - (B - X).y * (C - X).x) + 0.5 * abs((C - X).x * (A - X).y - (C - X).y * (A - X).x) + 0.5 * abs((A - X).x * (B - X).y - (A - X).y * (B - X).x)
-		&& input::InputManager::isButtonPressed(input::MouseButton::LEFT)) {
-		start = true;
+	if (X.x >= 914 && X.x <= 1067 && X.y >= 307 && X.y <= 460 && input::InputManager::isButtonPressed(input::MouseButton::LEFT)) {
+		nextState = 3;
 	}
 
 }
@@ -25,34 +35,58 @@ void game::Start::update(float _time, float _deltaTime)
 void game::Start::draw(float _time, float _deltaTime)
 {
 	meshRenderer.clear();
-	meshRenderer.draw(mesh, *texture, modelMatrix);
-	// _flyer.setView(glm::vec3(0, 0, -5), glm::vec3(0, 0, -1));
-	// camera.setView(_flyer.getView());
-
+	game::Actions::Draw(meshRenderer, registry);
 	meshRenderer.present(camera);
-	
-
 }
 
 game::Start::Start() : game::GameState(),
 	camera(graphics::Camera(90, .1f, 100)),
 	meshRenderer(),
-	mesh(graphics::Mesh("models/triangle.obj")),
+	mesh(graphics::Mesh("models/Square1.obj")),
 	modelMatrix(glm::identity<glm::mat4>())
 {
-	start = false;
-	end = false;
-
+	nextState = 0;
+	isFinished = false;
 	auto sampler = graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
 		graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
-
-	texture = graphics::Texture2D::load("../resources/textures/green1.png", sampler, false);
+	texture_white = graphics::Texture2D::load("../resources/textures/texture_white.png", sampler, false);
+	texture_blue = graphics::Texture2D::load("../resources/textures/texture_blue.png", sampler, false);
+	texture_orange = graphics::Texture2D::load("../resources/textures/texture_orange.png", sampler, false);
 
 	camera.setView(glm::translate(glm::vec3(0, 0, -5)));
+
+	Entity triangle1 = registry.create();
+	registry.addComponent<Mesh>(triangle1, &mesh);
+	registry.addComponent<Texture>(triangle1, texture_orange);
+	registry.addComponent<Transform>(triangle1, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(-4, 0, 0));
+	registry.addComponent<Visibility>(triangle1, true);
+	Entity triangle2 = registry.create();
+	registry.addComponent<Mesh>(triangle2, &mesh);
+	registry.addComponent<Texture>(triangle2, texture_white);
+	registry.addComponent<Transform>(triangle2, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(0, 0, 0));
+	registry.addComponent<Visibility>(triangle2, true);
+	Entity triangle3 = registry.create();
+	registry.addComponent<Mesh>(triangle3, &mesh);
+	registry.addComponent<Texture>(triangle3, texture_blue);
+	registry.addComponent<Transform>(triangle3, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(4, 0, 0));
+	registry.addComponent<Visibility>(triangle3, true);
 }
 
 bool game::Start::getIsFinished()
 {
-	return end;
+	return isFinished;
 }
+
+bool game::Start::getIsMenue()
+{
+	return true;
+}
+
+int game::Start::goToState()
+{
+	return nextState;
+}
+
+
+
 
