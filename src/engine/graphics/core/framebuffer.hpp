@@ -6,8 +6,7 @@ namespace graphics {
 
 	/// A framebuffer is a collection of textures to render on.
 	/// Renderbuffers are currently not supported.
-	class FrameBuffer
-	{
+	class FrameBuffer {
 	public:
 		unsigned getID() const { return m_fboID; }
 
@@ -15,8 +14,8 @@ namespace graphics {
 		~FrameBuffer();
 		FrameBuffer(const FrameBuffer &) = delete;
 		FrameBuffer(FrameBuffer &&) noexcept;
-		FrameBuffer & operator = (const FrameBuffer &) = delete;
-		FrameBuffer & operator = (FrameBuffer &&) noexcept;
+		FrameBuffer &operator=(const FrameBuffer &) = delete;
+		FrameBuffer &operator=(FrameBuffer &&) noexcept;
 
 		/// Binding a framebuffer to draw into its textures.
 		void bind();
@@ -24,9 +23,9 @@ namespace graphics {
 
 		/// Attach a 2D texture or a layer of another texure as depth buffer.
 		///	The texture format must be compatible (e.g. D32F).
-		void attachDepth(Texture & _texture, int _mipLevel = 0);
+		void attachDepth(Texture &_texture, int _mipLevel = 0);
 
-		void attach(int _colorAttachmentIdx, Texture & _texture, int _mipLevel = 0);
+		void attach(int _colorAttachmentIdx, Texture &_texture, int _mipLevel = 0);
 
 		/// Render one of the textures with a screenfilling quad.
 		/// \param [in] _attachment GL_DEPTH_ATTACHMENT or GL_COLOR_ATTACHMENTi
@@ -34,6 +33,7 @@ namespace graphics {
 
 		/// @brief Clear this buffers attachments if currently bound.
 		void clear();
+
 	private:
 		unsigned m_fboID;
 		unsigned m_drawBuffers[16];
@@ -43,4 +43,4 @@ namespace graphics {
 		unsigned m_colorTextures[16];
 	};
 
-} // namespace graphics
+}// namespace graphics

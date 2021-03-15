@@ -5,12 +5,11 @@ namespace graphics {
 	using namespace glm;
 
 	Sprite::Sprite(float _alignX, float _alignY,
-		Texture2D::Handle _textureHandle, int _texX, int _texY, int _texWidth, int _texHeight,
-		int _numX, int _numY)
-	{
+								 Texture2D::Handle _textureHandle, int _texX, int _texY, int _texWidth, int _texHeight,
+								 int _numX, int _numY) {
 		// TODO: error handling for parameters
-		const float w = _textureHandle ? (float)_textureHandle->getWidth() : 1.0f;
-		const float h = _textureHandle ? (float)_textureHandle->getHeight() : 1.0f;
+		const float w = _textureHandle ? (float) _textureHandle->getWidth() : 1.0f;
+		const float h = _textureHandle ? (float) _textureHandle->getHeight() : 1.0f;
 
 		if (_texWidth == -1) _texWidth = _textureHandle ? _textureHandle->getWidth() : 1;
 		if (_texHeight == -1) _texHeight = _textureHandle ? _textureHandle->getHeight() : 1;
@@ -27,4 +26,4 @@ namespace graphics {
 		size.x = _texWidth;
 		size.y = _texHeight;
 	}
-}
+}// namespace graphics

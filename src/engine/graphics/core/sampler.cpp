@@ -1,15 +1,13 @@
-#include "opengl.hpp"
 #include "sampler.hpp"
+#include "opengl.hpp"
 
 namespace graphics {
 
-	Sampler::Sampler(Filter _minFilter, Filter _magFilter, Filter _mipFilter, Border _borderHandling, unsigned _maxAnisotropy) :
-		m_minFilter(_minFilter),
-		m_magFilter(_magFilter),
-		m_mipFilter(_mipFilter),
-		m_borderHandling(_borderHandling),
-		m_maxAnisotropy(_maxAnisotropy)
-	{
+	Sampler::Sampler(Filter _minFilter, Filter _magFilter, Filter _mipFilter, Border _borderHandling, unsigned _maxAnisotropy) : m_minFilter(_minFilter),
+																																																															 m_magFilter(_magFilter),
+																																																															 m_mipFilter(_mipFilter),
+																																																															 m_borderHandling(_borderHandling),
+																																																															 m_maxAnisotropy(_maxAnisotropy) {
 		glCall(glGenSamplers, 1, &m_samplerID);
 		glCall(glSamplerParameteri, m_samplerID, GL_TEXTURE_WRAP_S, static_cast<GLint>(_borderHandling));
 		glCall(glSamplerParameteri, m_samplerID, GL_TEXTURE_WRAP_T, static_cast<GLint>(_borderHandling));
@@ -40,16 +38,14 @@ namespace graphics {
 		spdlog::debug("[graphics] Created sampler {}.", m_samplerID);
 	}
 
-	Sampler::~Sampler()
-	{
+	Sampler::~Sampler() {
 		glCall(glDeleteSamplers, 1, &m_samplerID);
 		spdlog::debug("[graphics] Deleted sampler {}.", m_samplerID);
 	}
 
-	void Sampler::bind(unsigned _textureSlot) const
-	{
+	void Sampler::bind(unsigned _textureSlot) const {
 		// TODO: check binding
 		glCall(glBindSampler, _textureSlot, m_samplerID);
 	}
 
-} // namespace graphics
+}// namespace graphics

@@ -6,8 +6,7 @@
 
 struct GLFWwindow;
 
-namespace input
-{
+namespace input {
 	enum struct ActionState : char {
 		UP = 0,
 		PRESSED,
@@ -16,14 +15,13 @@ namespace input
 	};
 
 	// Simple wrapper to handle glfw inputs.
-	class InputManager
-	{
+	class InputManager {
 	public:
-		static void initialize(GLFWwindow* _window);
+		static void initialize(GLFWwindow *_window);
 		static void update();
 
 		static bool isKeyPressed(Key _key);
-		static const char* getKeyName(Key _key);
+		static const char *getKeyName(Key _key);
 		static ActionState getKeyState(Key _key);
 
 		// mouse
@@ -39,11 +37,12 @@ namespace input
 		static void setCursorMode(CursorMode _mode);
 
 		static void updateKeyStates();
-	private:
-		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-		static void buttonCallback(GLFWwindow* window, int button, int action, int mods);
 
-		static GLFWwindow* s_window;
+	private:
+		static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+		static void buttonCallback(GLFWwindow *window, int button, int action, int mods);
+
+		static GLFWwindow *s_window;
 		static std::array<ActionState, static_cast<size_t>(Key::Count)> m_keyStates;
 		static std::array<ActionState, static_cast<size_t>(Key::Count)> m_buttonStates;
 		static glm::vec2 cursorPosition;
@@ -51,8 +50,7 @@ namespace input
 	};
 
 	// Interface to map game actions to keys.
-	class InputInterface
-	{
+	class InputInterface {
 	public:
 		virtual ~InputInterface() {}
 		virtual bool isKeyPressed(Action _action) const = 0;
@@ -60,4 +58,4 @@ namespace input
 		virtual float getAxis(Axis _axis) const = 0;
 		virtual glm::vec2 getCursorPos() const = 0;
 	};
-}
+}// namespace input

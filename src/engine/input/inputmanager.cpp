@@ -98,4 +98,4 @@ namespace input {
 
 	glm::vec2 InputManager::cursorPosition = glm::vec2();
 	glm::vec2 InputManager::lastCursorPosition = glm::vec2();
-}
+}// namespace input

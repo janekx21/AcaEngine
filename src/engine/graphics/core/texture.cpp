@@ -1,8 +1,8 @@
 #include "texture.hpp"
 #include "opengl.hpp"
-#include <spdlog/spdlog.h>
 #include <glm/common.hpp>
 #include <memory.h>
+#include <spdlog/spdlog.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"

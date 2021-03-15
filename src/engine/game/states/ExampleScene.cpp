@@ -1,10 +1,10 @@
 #include "ExampleScene.hpp"
+#include "engine/graphics/core/device.hpp"
+#include "engine/input/inputmanager.hpp"
 #include <glm/detail/type_quat.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 #include <random>
-#include "engine/input/inputmanager.hpp"
-#include "engine/graphics/core/device.hpp"
 
 float lerp(float a, float b, float f) {
 	return a + f * (b - a);
@@ -19,7 +19,7 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 																	 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
 
 	linear = new graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
-														 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
+																 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
 
 	white = graphics::Texture2D::load("../resources/textures/white.png", sampler, false);
 
@@ -29,12 +29,9 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 
 	auto size = graphics::Device::getBufferSize();
 
-	depthTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::D32F, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
-																																																					graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
-	colorTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGB8, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
-																																																					graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
-	normalTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGBA16F, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
-																																																							graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
+	depthTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::D32F, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
+	colorTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGB8, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
+	normalTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGBA16F, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
 	positionTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGBA16F, *linear);
 	backBuffer.attachDepth(*depthTexture, 0);
 	backBuffer.attach(0, *colorTexture, 0);
@@ -81,7 +78,7 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 	auto repeatSampler = graphics::Sampler(graphics::Sampler::Filter::POINT, graphics::Sampler::Filter::POINT,
 																				 graphics::Sampler::Filter::POINT, graphics::Sampler::Border::REPEAT);
 	noiseTexture = graphics::Texture2D::create(NOISE_SIZE, NOISE_SIZE, graphics::TexFormat::RGBA16F, repeatSampler);
-	noiseTexture->fillMipMapFloat(0, (float*)noiseList.data());
+	noiseTexture->fillMipMapFloat(0, (float *) noiseList.data());
 
 	pos = glm::vec3(0, 0, 0);
 	rot = 0;
@@ -116,7 +113,7 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 
 
 	auto location = glm::vec3(-.5, .6, 1.33) + pos;
-	auto rotation = glm::quat(glm::vec3(0, glm::radians(-133.0) + rot*.5, 0));
+	auto rotation = glm::quat(glm::vec3(0, glm::radians(-133.0) + rot * .5, 0));
 	camera.setView(glm::translate(-location) * glm::toMat4(rotation));
 
 
@@ -149,12 +146,11 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 			program.setUniform(location, slot);
 		}
 		{
-			// const auto slot = 3;
-			// depthTexture->bind(slot);
-			// auto location = program.getUniformLoc("depth_texture");
-			// program.setUniform(location, slot);
-		}
-		{
+						// const auto slot = 3;
+						// depthTexture->bind(slot);
+						// auto location = program.getUniformLoc("depth_texture");
+						// program.setUniform(location, slot);
+		} {
 			const auto slot = 4;
 			noiseTexture->bind(slot);
 			auto location = program.getUniformLoc("noise_texture");
@@ -170,7 +166,6 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 		meshRenderer.present(camera);
 		meshRenderer.clear();
 	}
-
 
 
 	/*

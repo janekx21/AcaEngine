@@ -8,29 +8,24 @@ namespace utils {
 	bool Config::s_isLoaded = false;
 	json Config::s_config;
 
-	void Config::load()
-	{
+	void Config::load() {
 		try {
 			std::ifstream file("config.json");
 			file >> s_config;
-		}
-		catch (...)
-		{
+		} catch (...) {
 		}
 
 		s_isLoaded = true;
 	}
 
-	json& Config::get()
-	{
+	json &Config::get() {
 		if (!s_isLoaded) load();
 
 		return s_config;
 	}
 
-	void Config::save()
-	{
+	void Config::save() {
 		std::ofstream file("config.json");
 		file << s_config;
 	}
-}
+}// namespace utils

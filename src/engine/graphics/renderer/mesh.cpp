@@ -1,6 +1,6 @@
-#include <string>
 #include "mesh.hpp"
 #include "engine/utils/meshloader.hpp"
+#include <string>
 
 namespace graphics {
 	const int VERTEX_PER_POLYGON = 3;
@@ -8,22 +8,22 @@ namespace graphics {
 	const int TEXTURE_COORD_DIMENSIONS = 2;
 
 	const std::vector<VertexAttribute> Mesh::attributes = {
-					{graphics::PrimitiveFormat::FLOAT, POSITION_DIMENSIONS,      false, false},
-					{graphics::PrimitiveFormat::FLOAT, POSITION_DIMENSIONS,      false, false},
+					{graphics::PrimitiveFormat::FLOAT, POSITION_DIMENSIONS, false, false},
+					{graphics::PrimitiveFormat::FLOAT, POSITION_DIMENSIONS, false, false},
 					{graphics::PrimitiveFormat::FLOAT, TEXTURE_COORD_DIMENSIONS, false, false},
 	};
 
 	Mesh::Mesh(const std::string &path) : geometryBuffer(
-					GeometryBuffer(graphics::GLPrimitiveType::TRIANGLES, attributes.data(), attributes.size(), false)) {
+																								GeometryBuffer(graphics::GLPrimitiveType::TRIANGLES, attributes.data(), attributes.size(), false)) {
 		auto meshData = utils::MeshLoader::get(path.c_str());
 		auto floatCount = 0;
-		for(auto& attribute : Mesh::attributes) {
+		for (auto &attribute : Mesh::attributes) {
 			floatCount += attribute.numComponents;
 		}
 		std::vector<float> bufferData(0);
 
-		for(auto& face : meshData->faces) {
-			for(auto& vertex : face.indices) {
+		for (auto &face : meshData->faces) {
+			for (auto &vertex : face.indices) {
 				auto pos = meshData->positions[vertex.positionIdx];
 				bufferData.push_back(pos.x);
 				bufferData.push_back(pos.y);
@@ -52,4 +52,4 @@ namespace graphics {
 	void Mesh::draw() const {
 		geometryBuffer.draw();
 	}
-};
+};// namespace graphics

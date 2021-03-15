@@ -5,15 +5,13 @@
 namespace graphics {
 
 	/// A buffer is a pure memory block on GPU side.
-	class Buffer
-	{
+	class Buffer {
 	public:
 		// The type of a buffer determines its main purpose.
 		// The buffer will be bound to that slot for several operations.
 		// However, you can always bind the same buffer for different
 		// purposes.
-		enum class Type
-		{
+		enum class Type {
 			VERTEX = GL_ARRAY_BUFFER,
 			INDEX = GL_ELEMENT_ARRAY_BUFFER,
 			SHADER_STORAGE = GL_SHADER_STORAGE_BUFFER,
@@ -25,8 +23,7 @@ namespace graphics {
 			TRANSFORM_FEEDBACK = GL_TRANSFORM_FEEDBACK_BUFFER,
 		};
 
-		enum Usage
-		{
+		enum Usage {
 			// Allow glBufferSubData updates for this buffer.
 			SUB_DATA_UPDATE = GL_DYNAMIC_STORAGE_BIT,
 			// Allow read accesses from CPU side
@@ -46,8 +43,7 @@ namespace graphics {
 		};
 
 		// Buffers can only use a restricted set of the internal formats
-		enum class TextureFormat
-		{
+		enum class TextureFormat {
 			// One channel
 			R8 = GL_R8,
 			R8I = GL_R8I,
@@ -93,15 +89,15 @@ namespace graphics {
 		// Create a raw buffer for data. Buffers created with this method
 		// cannot be used as texture buffers!
 		// _data: data for initialization.
-		Buffer(Type _type, GLuint _elementSize, GLuint _numElements, Usage _usageBits = Usage(), const GLvoid* _data = nullptr);
+		Buffer(Type _type, GLuint _elementSize, GLuint _numElements, Usage _usageBits = Usage(), const GLvoid *_data = nullptr);
 		// Create a buffer including a texture view
-		Buffer(Type _type, GLuint _elementSize, GLuint _numElements, TextureFormat _format, Usage _usageBits = Usage(), const GLvoid* _data = nullptr);
+		Buffer(Type _type, GLuint _elementSize, GLuint _numElements, TextureFormat _format, Usage _usageBits = Usage(), const GLvoid *_data = nullptr);
 		~Buffer();
 		// Move but not copy-able
-		Buffer(Buffer&& _rhs);
-		Buffer(const Buffer&) = delete;
-		Buffer& operator = (Buffer&& _rhs);
-		Buffer& operator = (const Buffer& _rhs) = delete;
+		Buffer(Buffer &&_rhs);
+		Buffer(const Buffer &) = delete;
+		Buffer &operator=(Buffer &&_rhs);
+		Buffer &operator=(const Buffer &_rhs) = delete;
 
 		// Bind as vertex buffer
 		// _offset: offset to the first element in number of elements
@@ -124,15 +120,14 @@ namespace graphics {
 
 		// Upload a small chunk of data to a specific position.
 		// Requires Usage::SUB_DATA_UPDATE.
-		void subDataUpdate(GLintptr _offset, GLsizei _size, const GLvoid* _data);
+		void subDataUpdate(GLintptr _offset, GLsizei _size, const GLvoid *_data);
 
 
 		// Set the entire buffer content to zero.
 		void clear();
 
 
-		enum MappingFlags
-		{
+		enum MappingFlags {
 			READ = GL_MAP_READ_BIT,
 			WRITE = GL_MAP_WRITE_BIT,
 			// Open a persistent mapping.
@@ -148,7 +143,7 @@ namespace graphics {
 		// Mapping is the recommended way to handle buffer data.
 		// You can read/write the returned pointer until unmap(). If mapped
 		// persistently you must make changes visible through flush() and receive().
-		void* map(MappingFlags _access, GLintptr _offset = 0, GLsizei _size = GLsizei(-1));
+		void *map(MappingFlags _access, GLintptr _offset = 0, GLsizei _size = GLsizei(-1));
 		// Release mapping (pointer becomes invalid), a flush is done automatically
 		// except for PERSISTENT INCOHERENT buffers.
 		void unmap();
@@ -162,9 +157,10 @@ namespace graphics {
 		GLuint numElements() const { return m_size / m_elementSize; }
 
 		GLuint glID() { return m_id; }
+
 	private:
 		GLuint m_id;
-		GLuint m_tbID;			// An extra ID for a texture buffer view
+		GLuint m_tbID;// An extra ID for a texture buffer view
 		Type m_type;
 		GLuint m_size;
 		GLuint m_elementSize;
@@ -174,4 +170,4 @@ namespace graphics {
 		GLuint m_mappedSize;
 	};
 
-} // namespace graphics
+}// namespace graphics

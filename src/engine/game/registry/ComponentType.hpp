@@ -3,5 +3,4 @@
 struct ComponentType {
 	std::vector<char> data;
 	size_t typeSize;
-	
 };

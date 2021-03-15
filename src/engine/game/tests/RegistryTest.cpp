@@ -1,6 +1,6 @@
+#include "testutils.hpp"
 #include <engine/game/registry/Registry.hpp>
 #include <vector>
-#include "testutils.hpp"
 
 struct Foo {
 	int i;
@@ -10,8 +10,7 @@ struct Bar {
 	float f;
 };
 
-int main()
-{
+int main() {
 	using namespace game;
 
 	Registry registry;
@@ -33,19 +32,16 @@ int main()
 
 	EXPECT(!registry.getEntity(refDel), "Reference remains invalid after reuse of the id.");
 
-	for (int i = 0; i < static_cast<int>(entities.size()); ++i)
-	{
-		const Foo& foo = registry.addComponent<Foo>(entities[i], i);
+	for (int i = 0; i < static_cast<int>(entities.size()); ++i) {
+		const Foo &foo = registry.addComponent<Foo>(entities[i], i);
 		EXPECT(foo.i == i, "Add a component.");
-		if (i % 3 == 0)
-		{
-			const Bar& bar = registry.addComponent<Bar>(entities[i], static_cast<float>(i));
+		if (i % 3 == 0) {
+			const Bar &bar = registry.addComponent<Bar>(entities[i], static_cast<float>(i));
 			EXPECT(bar.f == static_cast<float>(i), "Add a component.");
 		}
 	}
 
-	for (int i = 0; i < static_cast<int>(entities.size()); ++i)
-	{
+	for (int i = 0; i < static_cast<int>(entities.size()); ++i) {
 		EXPECT(registry.getComponent<Foo>(entities[i]), "Retrieve a component.");
 		EXPECT(registry.getComponentUnsafe<Foo>(entities[i]).i == i, "Retrieve a component.");
 	}
@@ -58,8 +54,7 @@ int main()
 
 	registry.erase(entities[2]);
 
-	for (int i = 3; i < static_cast<int>(entities.size()); ++i)
-	{
+	for (int i = 3; i < static_cast<int>(entities.size()); ++i) {
 		EXPECT(registry.getComponent<Foo>(entities[i]), "Other components are untouched.");
 		EXPECT(registry.getComponentUnsafe<Foo>(entities[i]).i == i, "Other components are untouched.");
 	}
@@ -67,23 +62,22 @@ int main()
 	int sum = 0;
 	//registry.execute([&sum](const Foo& foo) { sum += foo.i; });
 	// without auto deduction
-	registry.execute<Foo>([&sum](const Foo& foo) { sum += foo.i; });
+	registry.execute<Foo>([&sum](const Foo &foo) { sum += foo.i; });
 	EXPECT(sum == 10 * 11 / 2 - 3, "Execute action on a single component type.");
 
 	sum = 0;
 	//registry.execute([&sum](const Bar& bar, const Foo& foo) { sum += foo.i - 2 * static_cast<int>(bar.f); });
-	registry.execute<Bar,Foo>([&sum](const Bar& bar, const Foo& foo) { sum += foo.i - 2 * static_cast<int>(bar.f); });
+	registry.execute<Bar, Foo>([&sum](const Bar &bar, const Foo &foo) { sum += foo.i - 2 * static_cast<int>(bar.f); });
 	EXPECT(sum == -3 - 6 - 9, "Execute action on multiple component types.");
 
-	registry.execute<Entity, Bar>([&](Entity ent, Bar& bar)
-	//registry.execute([&](Entity ent, Bar& bar)
-		{
-			EXPECT(registry.getComponentUnsafe<Bar>(ent).f == bar.f, "Execute provides the correct entity.");
-			bar.f = -1.f;
-		});
+	registry.execute<Entity, Bar>([&](Entity ent, Bar &bar)
+																//registry.execute([&](Entity ent, Bar& bar)
+																{
+																	EXPECT(registry.getComponentUnsafe<Bar>(ent).f == bar.f, "Execute provides the correct entity.");
+																	bar.f = -1.f;
+																});
 
-	for (size_t i = 3; i < entities.size(); i += 3)
-	{
+	for (size_t i = 3; i < entities.size(); i += 3) {
 		EXPECT(registry.getComponentUnsafe<Bar>(entities[i]).f == -1.f, "Action can change components.");
 	}
 	std::cout << "RegsitryTest done!\n";

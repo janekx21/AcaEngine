@@ -11,4 +11,4 @@ namespace math {
 	const glm::vec3 backwards(0, 0, 1);
 	const glm::vec3 one(1, 1, 1);
 	const glm::vec3 zero(0, 0, 0);
-}
+}// namespace math

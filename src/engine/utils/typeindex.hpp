@@ -2,17 +2,15 @@
 
 namespace utils {
 
-	class TypeIndex
-	{
+	class TypeIndex {
 		int m_counter = 0;
 
 	public:
 		template<typename T>
-		int value()
-		{
+		int value() {
 			static int id = m_counter++;
 			return id;
 		}
 	};
 
-}
+}// namespace utils

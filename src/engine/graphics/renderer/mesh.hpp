@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include "engine/graphics/core/geometrybuffer.hpp"
+#include <string>
+#include <vector>
 
 namespace graphics {
 	class Mesh {
@@ -14,4 +14,4 @@ namespace graphics {
 		static const std::vector<VertexAttribute> attributes;
 		GeometryBuffer geometryBuffer;
 	};
-}
+}// namespace graphics

@@ -9,25 +9,21 @@
 #include <optional>
 #include <vector>
 
-namespace utils
-{
+namespace utils {
 
 	/**
 	 * @brief Collection of raw mesh data.
 	 */
-	struct MeshData
-	{
+	struct MeshData {
 		/**
 		 * @brief Collection of vertices describing one face.
 		 * contains 3 ordered vertices
 		 */
-		struct FaceData
-		{
+		struct FaceData {
 			/**
 			 * @brief Collection of ids describing one vertex.
 			 */
-			struct VertexIndices
-			{
+			struct VertexIndices {
 				int positionIdx;
 				///< id to fetch the position from MeshData::positions
 				std::optional<int> textureCoordinateIdx;
@@ -40,23 +36,23 @@ namespace utils
 			std::array<VertexIndices, 3> indices;
 		};
 
-		using Handle = const MeshData*;
+		using Handle = const MeshData *;
 
 
 		/**
 		 * @brief load mesh data from an file
 		 * @param _fileName path to file
 		 */
-		static Handle load( const char* _fileName );
+		static Handle load(const char *_fileName);
 
-		static void unload( Handle _meshData );
+		static void unload(Handle _meshData);
 
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec2> textureCoordinates;
 		std::vector<glm::vec3> normals;
-		std::vector<FaceData>  faces;
+		std::vector<FaceData> faces;
 	};
 
 	using MeshLoader = utils::ResourceManager<MeshData>;
 
-} // end utils
+}// namespace utils

@@ -4,16 +4,14 @@
 
 namespace math {
 
-	inline glm::mat2 rotation(float _angle)
-	{
+	inline glm::mat2 rotation(float _angle) {
 		const float sinA = sin(_angle);
 		const float cosA = cos(_angle);
 		return glm::mat2(cosA, -sinA,
-			sinA, cosA);
+										 sinA, cosA);
 	}
 
-	inline glm::mat4 extendTransform(const glm::mat3& _transform)
-	{
+	inline glm::mat4 extendTransform(const glm::mat3 &_transform) {
 		glm::mat4 mat{};
 		mat[0][0] = _transform[0][0];
 		mat[0][1] = _transform[0][1];
@@ -25,4 +23,4 @@ namespace math {
 
 		return mat;
 	}
-}
+}// namespace math

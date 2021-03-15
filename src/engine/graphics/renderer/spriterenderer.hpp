@@ -1,8 +1,8 @@
 #pragma once
 
-#include "sprite.hpp"
-#include "../core/shader.hpp"
 #include "../camera.hpp"
+#include "../core/shader.hpp"
+#include "sprite.hpp"
 #include <vector>
 
 namespace graphics {
@@ -10,8 +10,7 @@ namespace graphics {
 	/// Batch renderer for sprites.
 	/// \details This renderer represents exactly one pipeline state and contains one vertex and index
 	///		buffer, as well as a texture-atlas.
-	class SpriteRenderer
-	{
+	class SpriteRenderer {
 	public:
 		/// Initialize the renderer once.
 		SpriteRenderer();
@@ -28,13 +27,13 @@ namespace graphics {
 		/// \param [in] _animY Choose a tile in Y direction when the sprite was created with more than one.
 		///		E.g. a 1.4f means, that the second and third tile are interpolated with factor 0.4.
 		///		If necessary a modulo operation is applied automatically.
-		void draw(const Sprite& _sprite, const glm::vec3& _position, float _rotation, const glm::vec2& _scale, float _animX = 0.0f, float _animY = 0.0f);
+		void draw(const Sprite &_sprite, const glm::vec3 &_position, float _rotation, const glm::vec2 &_scale, float _animX = 0.0f, float _animY = 0.0f);
 
 		/// Clear all existing instances (recommended for fully dynamic buffers)
 		void clear();
-		
+
 		/// Single draw call for all instances.
-		void present(const Camera& _camera);
+		void present(const Camera &_camera);
 
 		/// Check if there are any instances to draw
 		bool isEmpty() const { return m_instances.empty(); }
@@ -42,24 +41,23 @@ namespace graphics {
 	private:
 #pragma pack(push, 4)
 
-		struct SpriteInstance
-		{
+		struct SpriteInstance {
 			Sprite::SpriteData sprite;
 			glm::vec3 position;
 			float rotation;
-			glm::uvec2 scale; // 4 packed halfs
-		//	glm::vec<half, 4> scale;
+			glm::uvec2 scale;// 4 packed halfs
+											 //	glm::vec<half, 4> scale;
 			glm::vec2 animation;
 		};
 #pragma pack(pop)
 
-		unsigned m_vao;		///< OpenGL vertex array object
-		unsigned m_vbo;		///< OpenGL vertex buffer for sprites
+		unsigned m_vao;///< OpenGL vertex array object
+		unsigned m_vbo;///< OpenGL vertex buffer for sprites
 
 		std::vector<SpriteInstance> m_instances;
 		mutable bool m_dirty;
 
-		Program m_program; // todo: move outside to reuse
+		Program m_program;// todo: move outside to reuse
 	};
 
-}
+}// namespace graphics

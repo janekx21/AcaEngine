@@ -5,8 +5,7 @@
 
 namespace graphics {
 
-	class Sprite
-	{
+	class Sprite {
 	public:
 		/// Create a new sprite definition.
 		/// \details Creates a sprite of a certain size and positioning which covers a (region) of a
@@ -22,17 +21,16 @@ namespace graphics {
 		/// \param [in] _texY Bottom pixel coordinate in the texture. The default is 0.
 		/// \param [in] _texWidth The width of the texture region in pixels. The default -1 uses the
 		///		full texture.
-		/// \param [in] _texWidth The height of the texture region in pixels. The default -1 uses the 
+		/// \param [in] _texWidth The height of the texture region in pixels. The default -1 uses the
 		///		full texture.
 		/// \param [in] _numX Number of tiles in X-direction. This can be used for animated sprites.
 		/// \param [in] _numX Number of tiles in Y-direction. This can be used for animated sprites.
 		Sprite(float _alignX, float _alignY,
-			Texture2D::Handle _textureHandle, int _texX = 0, int _texY = 0, int _texWidth = -1, int _texHeight = -1,
-			int _numX = 1, int _numY = 1);
+					 Texture2D::Handle _textureHandle, int _texX = 0, int _texY = 0, int _texWidth = -1, int _texHeight = -1,
+					 int _numX = 1, int _numY = 1);
 
 #pragma pack(push, 4)
-		struct SpriteData
-		{
+		struct SpriteData {
 			glm::u16vec4 texCoords;
 			uint64_t texture;
 			glm::u16vec2 numTiles;
@@ -42,4 +40,4 @@ namespace graphics {
 		glm::vec2 offset;
 		glm::ivec2 size;
 	};
-}
+}// namespace graphics

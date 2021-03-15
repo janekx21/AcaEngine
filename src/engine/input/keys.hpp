@@ -7,11 +7,11 @@ namespace input {
 		UNKNOWN = -1,
 		/* Printable keys */
 		SPACE = 32,
-		APOSTROPHE = 39,  /* ' */
-		COMMA = 44,  /* , */
-		MINUS = 45,  /* - */
-		PERIOD = 46,  /* . */
-		SLASH = 47,  /* / */
+		APOSTROPHE = 39, /* ' */
+		COMMA = 44,      /* , */
+		MINUS = 45,      /* - */
+		PERIOD = 46,     /* . */
+		SLASH = 47,      /* / */
 		Num0 = 48,
 		Num1 = 49,
 		Num2 = 50,
@@ -22,8 +22,8 @@ namespace input {
 		Num7 = 55,
 		Num8 = 56,
 		Num9 = 57,
-		SEMICOLON = 59,  /* ; */
-		EQUAL = 61,  /* = */
+		SEMICOLON = 59, /* ; */
+		EQUAL = 61,     /* = */
 		A = 65,
 		B = 66,
 		C = 67,
@@ -51,11 +51,11 @@ namespace input {
 		Y = 89,
 		Z = 90,
 		LEFT_BRACKET = 91,  /* [ */
-		BACKSLASH = 92,  /* \ */
-		RIGHT_BRACKET = 93,  /* ] */
+		BACKSLASH = 92,     /* \ */
+		RIGHT_BRACKET = 93, /* ] */
 		GRAVE_ACCENT = 96,  /* ` */
-		WORLD_1 = 161, /* non-US #1 */
-		WORLD_2 = 162, /* non-US #2 */
+		WORLD_1 = 161,      /* non-US #1 */
+		WORLD_2 = 162,      /* non-US #2 */
 
 		/* Function keys */
 		ESCAPE = 256,
@@ -63,7 +63,7 @@ namespace input {
 		TAB = 258,
 		BACKSPACE = 259,
 		INSERT = 260,
-	//	DELETE = 261,
+		//	DELETE = 261,
 		RIGHT = 262,
 		LEFT = 263,
 		DOWN = 264,
@@ -132,7 +132,7 @@ namespace input {
 	};
 
 	// Type safe list of all GLFW_MOUSE_BUTTON_*
-	enum class MouseButton : int{
+	enum class MouseButton : int {
 		LEFT = 0,
 		RIGHT = 1,
 		MIDDLE = 2,
@@ -143,4 +143,4 @@ namespace input {
 		X8 = 7,
 		Count
 	};
-}
+}// namespace input
