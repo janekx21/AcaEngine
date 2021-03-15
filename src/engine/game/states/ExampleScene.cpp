@@ -13,14 +13,8 @@ float lerp(float a, float b, float f) {
 game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 																		 meshRenderer(),
 																		 scene(graphics::Mesh("models/scene.obj")),
-																		 quad(graphics::Mesh("models/quad.obj")),
-																		 backBuffer() {
-
-	linear = new graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
-																 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
-
-	white = graphics::Texture2D::load("../resources/textures/white.png", graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
-																																												 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP), false);
+																		 quad(graphics::Mesh("models/quad.obj")) {
+	white = graphics::Texture2D::load("../resources/textures/white.png", graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP), false);
 
 	auto location = glm::vec3(-.5, .6, 1.33);
 	auto rotation = glm::quat(glm::vec3(0, glm::radians(-133.0), 0));
@@ -28,20 +22,12 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 
 	auto size = graphics::Device::getBufferSize();
 
-	depthTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::D32F, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
-	colorTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGB8, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
-	normalTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGBA16F, graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP));
-	positionTexture = graphics::Texture2D::create(size.x, size.y, graphics::TexFormat::RGBA16F, *linear);
-	backBuffer.attachDepth(*depthTexture, 0);
-	backBuffer.attach(0, *colorTexture, 0);
-	backBuffer.attach(1, *normalTexture, 0);
-	backBuffer.attach(2, *positionTexture, 0);
+	ambientOcclusionProgram = graphics::Program();
+	ambientOcclusionProgram.attach(graphics::ShaderManager::get("shader/fullscreen.vert", graphics::ShaderType::VERTEX));
+	ambientOcclusionProgram.attach(graphics::ShaderManager::get("shader/ambientOcclusion.frag", graphics::ShaderType::FRAGMENT));
+	ambientOcclusionProgram.link();
 
-	program = graphics::Program();
-	program.attach(graphics::ShaderManager::get("shader/fullscreen.vert", graphics::ShaderType::VERTEX));
-	program.attach(graphics::ShaderManager::get("shader/ambientOcclusion.frag", graphics::ShaderType::FRAGMENT));
-	program.link();
-
+	meshRenderer.setLightingShader(ambientOcclusionProgram);
 
 	auto random01 = std::uniform_real_distribution<float>(0, 1);
 	auto generator = std::default_random_engine();
@@ -78,6 +64,13 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 																				 graphics::Sampler::Filter::POINT, graphics::Sampler::Border::REPEAT);
 	noiseTexture = graphics::Texture2D::create(NOISE_SIZE, NOISE_SIZE, graphics::TexFormat::RGBA16F, repeatSampler);
 	noiseTexture->fillMipMapFloat(0, (float *) noiseList.data());
+
+	ambientOcclusionProgram.setUniform(ambientOcclusionProgram.getUniformLoc("samples"), sampleList);
+	{
+		const auto slot = 4;
+		noiseTexture->bind(slot);
+		ambientOcclusionProgram.setUniform(ambientOcclusionProgram.getUniformLoc("noise_texture"), slot);
+	}
 
 	pos = glm::vec3(0, 0, 0);
 	rot = 0;
@@ -119,43 +112,11 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 	meshRenderer.draw(scene, *white, glm::identity<glm::mat4>());
 
 	if (!input::InputManager::isKeyPressed(input::Key::SPACE)) {
-		backBuffer.bind();
-		backBuffer.clear();
+
+		ambientOcclusionProgram.setUniform(ambientOcclusionProgram.getUniformLoc("view_matrix"), camera.getView());
+		ambientOcclusionProgram.setUniform(ambientOcclusionProgram.getUniformLoc("projection_matrix"), camera.getProjection());
 		meshRenderer.present(camera);
 		meshRenderer.clear();
-		backBuffer.unbind();
-
-		program.use();
-		{
-			const auto slot = 0;
-			positionTexture->bind(slot);
-			auto location = program.getUniformLoc("position_texture");
-			program.setUniform(location, slot);
-		}
-		{
-			const auto slot = 1;
-			normalTexture->bind(slot);
-			auto location = program.getUniformLoc("normal_texture");
-			program.setUniform(location, slot);
-		}
-		{
-			const auto slot = 2;
-			colorTexture->bind(slot);
-			auto location = program.getUniformLoc("color_texture");
-			program.setUniform(location, slot);
-		}
-		{
-			const auto slot = 4;
-			noiseTexture->bind(slot);
-			auto location = program.getUniformLoc("noise_texture");
-			program.setUniform(location, slot);
-		}
-
-		auto location2 = program.getUniformLoc("samples");
-		program.setUniform(location2, sampleList);
-		program.setUniform(program.getUniformLoc("projection_matrix"), camera.getProjection());
-
-		quad.draw();
 	} else {
 		meshRenderer.present(camera);
 		meshRenderer.clear();

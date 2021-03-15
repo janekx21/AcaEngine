@@ -14,8 +14,9 @@ namespace graphics {
 		MeshRenderer();
 
 		void draw(const Mesh &_mesh, const Texture2D &_texture, const glm::mat4 _transform);
-		void present(const Camera &_camera);
+		void present(const Camera &_camera, const glm::vec3& lightDirection = glm::vec3(-.2, -.5, -.2));
 		void clear();
+		void setLightingShader(const Program &shader);
 
 	private:
 		struct MeshInstance {
@@ -38,6 +39,10 @@ namespace graphics {
 		Texture2D *positionTexture{};
 		Program lightingProgram;
 		Mesh quad;
+
+		int positionTextureLocation;
+		int normalTextureLocation;
+		int lightingAlbedoTextureLocation;
 
 		void createGeometryProgram();
 		void findUniformLocations();

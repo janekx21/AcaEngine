@@ -3,6 +3,7 @@
 #include "../../utils/resourcemanager.hpp"
 #include "sampler.hpp"
 #include <cstdint>
+#include <glm/vec3.hpp>
 
 namespace graphics {
 
@@ -85,6 +86,8 @@ namespace graphics {
 		void fillMipMapFloat(int _level, const float *_data);
 		/// Makes the texture resident and may compute mip-maps.
 		Handle finalize(bool _createMipMaps = false, bool _makeResident = true);
+
+		void clear();
 
 		/// Bind 2D texture to given location
 		void bind(unsigned _slot) const;
