@@ -31,9 +31,6 @@ struct AngularVelocity {
 struct Visibility {
 	bool visible;
 };
-struct Number {
-	int number;
-};
 struct ObjectType {
 	int type; //0 = box = target| 1 = planet = projectile
 };

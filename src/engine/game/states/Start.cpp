@@ -2,9 +2,6 @@
 #include "engine/graphics/core/opengl.hpp"
 #include <chrono>
 #include <engine/game/actions/Actions.hpp>
-#include <engine/graphics/core/device.hpp>
-#include <glm/gtx/transform.hpp>
-#include <iostream>
 
 
 void game::Start::update(float _time, float _deltaTime) {

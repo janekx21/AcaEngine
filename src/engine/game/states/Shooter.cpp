@@ -3,10 +3,6 @@
 #include "engine/game/registry/Components.hpp"
 #include "engine/game/actions/Actions.hpp"
 #include <cstdlib>
-#include <iostream>
-#include <numbers>
-#include "engine/input/inputmanager.hpp"
-#include "engine/graphics/camera.hpp"
 #include <chrono>
 #include <GLFW\glfw3.h>
 

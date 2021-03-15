@@ -1,7 +1,5 @@
 #include "MovingPlanets.hpp"
 #include "engine/input/inputmanager.hpp"
-#include <glm/gtx/transform.hpp>
-#include <iostream>
 
 void game::MovingPlanets::update(float _time, float _deltaTime) {
 	if (input::InputManager::isKeyPressed(input::Key::ESCAPE)) {

@@ -1,5 +1,4 @@
 #include "ExampleScene.hpp"
-#include "engine/graphics/core/opengl.hpp"
 #include "engine/input/inputmanager.hpp"
 #include <engine/graphics/core/device.hpp>
 #include <glm/detail/type_quat.hpp>
