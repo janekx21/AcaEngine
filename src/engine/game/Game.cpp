@@ -1,11 +1,12 @@
 #include "Game.hpp"
-#include <GLFW\glfw3.h>
-#include <chrono>
 #include "engine/graphics/core/device.hpp"
 #include "engine/input/inputmanager.hpp"
 #include "engine/utils/meshloader.hpp"
-#include <engine/game/states/Shooter.hpp>
+#include <GLFW\glfw3.h>
+#include <chrono>
+#include <engine/game/states/ExampleScene.hpp>
 #include <engine/game/states/HorizontalSpring.hpp>
+#include <engine/game/states/Shooter.hpp>
 
 game::Game::Game() {
 	graphics::Device::initialize(1366, 768, false);
@@ -62,11 +63,11 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 			states.push_back(std::move(std::make_unique<game::Shooter>(shooter)));
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		/*if (states.back()->goToState() == 2 && states.back()->getIsMenue()) {
+		if (states.back()->goToState() == 2 && states.back()->getIsMenue()) {
 			states.back()->onPause();
-			states.push_back(std::move(std::make_unique<game::HorizontalSpring>(state1)));
+			states.push_back(std::move(std::make_unique<game::ExampleScene>()));
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		}*/
+		}
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		states.back()->draw(time.count(), dt.count());

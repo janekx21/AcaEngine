@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "engine/game/GameState.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/core/texture.hpp"
@@ -7,7 +6,6 @@
 #include "engine/graphics/renderer/meshrenderer.hpp"
 #include "engine/game/Flyer.hpp"
 #include "engine/game/Planet.hpp"
-#
 
 namespace game {
 	class MovingPlanets : public game::GameState {
