@@ -476,7 +476,7 @@ namespace game {
 
 		uint32_t getPositionInArchetype(Entity& entity) const {		// get entity index in archetype data array
 			auto& archetype = archetypes[entity.archetype];
-			for (int i = 0; i < archetype.entities.size(); i++) {
+			for (size_t i = 0; i < archetype.entities.size(); i++) {
 				if (archetype.entities[i] == entity.id) {
 					return i;
 				}

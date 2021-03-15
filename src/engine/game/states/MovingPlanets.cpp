@@ -1,4 +1,5 @@
 #include "MovingPlanets.hpp"
+#include "engine/input/inputmanager.hpp"
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 
@@ -36,8 +37,7 @@ mesh(graphics::Mesh("models/sphere.obj"))
 
 	auto sampler = graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
 		graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
-	
-	velocity = 10;
+
 	position = 0;
 	camera.setView(glm::translate(glm::vec3(0, 0, -5)));
 

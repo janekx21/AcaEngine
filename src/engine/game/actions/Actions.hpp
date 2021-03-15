@@ -8,6 +8,7 @@
 #include "engine/utils/containers/octree.hpp"
 #include "engine/input/inputmanager.hpp"
 #include <set>
+#include <glm/gtx/transform.hpp>
 
 namespace game {
 	class Actions {
@@ -166,7 +167,7 @@ namespace game {
 				if (_aabb.projectile) {
 					utils::SparseOctree<Entity, 3, float>::AABBQuery projectileQuery(_aabb.transformed_box);
 					Collisiontree.traverse(projectileQuery);
-					for (int i = 0; i < projectileQuery.hits.size(); i++) {
+					for (size_t i = 0; i < projectileQuery.hits.size(); i++) {
 						hitsSet.insert(projectileQuery.hits[i]);
 					}
 				}

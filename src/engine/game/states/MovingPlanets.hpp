@@ -4,7 +4,6 @@
 #include "engine/graphics/core/texture.hpp"
 #include "engine/graphics/renderer/mesh.hpp"
 #include "engine/graphics/renderer/meshrenderer.hpp"
-#include "engine/game/Flyer.hpp"
 #include "engine/game/Planet.hpp"
 
 namespace game {
@@ -26,7 +25,6 @@ namespace game {
 		std::vector<graphics::Texture2D::Handle> textures;
 		std::vector<Planet> planets;
 
-		float velocity;
 		float position;
 
 		bool end;
