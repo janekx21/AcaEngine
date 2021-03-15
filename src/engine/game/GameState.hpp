@@ -1,8 +1,7 @@
 #pragma once
 
 namespace game {
-	class GameState
-	{
+	class GameState {
 	public:
 		explicit GameState() = default;
 		virtual void onPause() = 0;
@@ -14,6 +13,5 @@ namespace game {
 		virtual bool getIsFinished() = 0;
 		virtual bool getIsMenue() = 0;
 		virtual int goToState() = 0;
-
 	};
-}
+}// namespace game

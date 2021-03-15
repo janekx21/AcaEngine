@@ -1,17 +1,17 @@
 #pragma once
 #include "engine/game/GameState.hpp"
+#include "engine/game/registry/Registry.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/core/texture.hpp"
 #include "engine/graphics/renderer/mesh.hpp"
 #include "engine/graphics/renderer/meshrenderer.hpp"
-#include "engine/game/registry/Registry.hpp"
 
 namespace game {
 	class Start : public game::GameState {
 	public:
 		Start();
-		void onPause() override {};
-		void onResume() override {};
+		void onPause() override{};
+		void onResume() override{};
 
 		void update(float _time, float _deltaTime) override;
 		void draw(float _time, float _deltaTime) override;
@@ -31,4 +31,4 @@ namespace game {
 		int nextState;
 		bool isFinished;
 	};
-}
+}// namespace game

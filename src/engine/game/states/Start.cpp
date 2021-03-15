@@ -7,7 +7,7 @@
 void game::Start::update(float _time, float _deltaTime) {
 	nextState = 0;
 	float c_value = abs((int(_time * 20) % 200 - 100) / 100.f);
-	glClearColor(1 - c_value, 0.5,c_value, 1);
+	glClearColor(1 - c_value, 0.5, c_value, 1);
 
 	if (input::InputManager::isKeyPressed(input::Key::ESCAPE)) {
 		isFinished = true;

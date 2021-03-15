@@ -4,8 +4,7 @@
 
 namespace graphics {
 
-	class Camera
-	{
+	class Camera {
 	public:
 		// Perspective
 		// @param _fov as angle
@@ -13,13 +12,17 @@ namespace graphics {
 		// Orthogonal
 		Camera(glm::vec2 _size, glm::vec2 _origin = glm::vec2(0.f), float _zNear = 0.f, float _zFar = 1.f);
 
-		const glm::mat4& getView() const { return m_view; }
-		const glm::mat4& getProjection() const { return m_projection; }
-		const glm::mat4& getViewProjection() const { return m_viewProjection; }
+		const glm::mat4 &getView() const { return m_view; }
+		const glm::mat4 &getProjection() const { return m_projection; }
+		const glm::mat4 &getViewProjection() const { return m_viewProjection; }
 
-		void setView(const glm::mat4& _view) { m_view = _view; updateMatrices(); }
+		void setView(const glm::mat4 &_view) {
+			m_view = _view;
+			updateMatrices();
+		}
 
-		glm::vec3 toWorldSpace(const glm::vec2& _sceenSpace) const;
+		glm::vec3 toWorldSpace(const glm::vec2 &_sceenSpace) const;
+
 	private:
 		void updateMatrices();
 
@@ -28,4 +31,4 @@ namespace graphics {
 		glm::mat4 m_viewProjection;
 		glm::mat4 m_viewProjectionInv;
 	};
-}
+}// namespace graphics

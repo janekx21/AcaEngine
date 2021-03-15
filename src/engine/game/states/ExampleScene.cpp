@@ -1,10 +1,10 @@
 #include "ExampleScene.hpp"
-#include "engine/input/inputmanager.hpp"
-#include <engine/graphics/core/device.hpp>
 #include <glm/detail/type_quat.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 #include <random>
+#include "engine/input/inputmanager.hpp"
+#include "engine/graphics/core/device.hpp"
 
 float lerp(float a, float b, float f) {
 	return a + f * (b - a);
