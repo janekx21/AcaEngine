@@ -15,12 +15,6 @@
 int main()
 {
 	game::Game game;
-	
-	game::Start state;
-	//game::HorizontalSpring state;
-	//game::Shooter state;
-	//game.run(std::make_unique<game::Shooter>(state));
-	//game.run(std::make_unique<game::HorizontalSpring>(state));
-	game.run(std::make_unique<game::Start>(state));
+	game.run(std::make_unique<game::Start>());
 	return EXIT_SUCCESS;
 }
