@@ -1,19 +1,20 @@
 #include "Game.hpp"
+#include "engine/game/states/ExampleScene.hpp"
+#include "engine/game/states/HorizontalSpring.hpp"
+#include "engine/game/states/Shooter.hpp"
 #include "engine/graphics/core/device.hpp"
+#include "engine/graphics/core/opengl.hpp"
 #include "engine/input/inputmanager.hpp"
 #include "engine/utils/meshloader.hpp"
-#include <GLFW\glfw3.h>
+#include <GLFW/glfw3.h>
 #include <chrono>
-#include <engine/game/states/ExampleScene.hpp>
-#include <engine/game/states/HorizontalSpring.hpp>
-#include <engine/game/states/Shooter.hpp>
 
 game::Game::Game() {
 	graphics::Device::initialize(1366, 768, false);
 	GLFWwindow *window = graphics::Device::getWindow();
 	input::InputManager::initialize(window);
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.8f, 0.8f,0.8f, 1);
+	graphics::glCall(glEnable, GL_DEPTH_TEST);
+	graphics::glCall(glClearColor, 0.8f, 0.8f, 0.8f, 1);
 }
 
 game::Game::~Game() {
@@ -39,7 +40,7 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 	Duration targetFrameTime = Duration(1.0 / 60.0);
 
 	while (!states.empty()) {
-		
+
 		auto now = Clock::now();
 		Duration time = now - beginTimePoint;
 		Duration dt = now - previousTimePoint;
@@ -68,18 +69,18 @@ void game::Game::run(std::unique_ptr<GameState> _initialState) {
 			states.push_back(std::move(std::make_unique<game::ExampleScene>()));
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		graphics::glCall(glClear, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		states.back()->draw(time.count(), dt.count());
-		
+
 		glfwSwapBuffers(graphics::Device::getWindow());
 
 		while (states.back()->getIsFinished() || glfwWindowShouldClose(graphics::Device::getWindow())) {
-			states.pop_back();	
-			
+			states.pop_back();
+
 			if (states.empty()) {
 				break;
-			}				
+			}
 			states.back()->onResume();
 		}
 	}

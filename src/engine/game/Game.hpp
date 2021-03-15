@@ -3,8 +3,7 @@
 #include <memory>
 #include <vector>
 namespace game {
-	class Game
-	{
+	class Game {
 	public:
 		// Initialize global resources
 		Game();
@@ -18,4 +17,4 @@ namespace game {
 	private:
 		std::vector<std::unique_ptr<GameState>> states;
 	};
-}
+}// namespace game
