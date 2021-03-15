@@ -75,6 +75,7 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 
 	pos = glm::vec3(0, 0, 0);
 	rot = 0;
+	camera.backgroundColor = glm::vec4(0, 0, .01, 1);
 }
 
 void game::ExampleScene::update(float _time, float _deltaTime) {
@@ -108,8 +109,6 @@ void game::ExampleScene::draw(float _time, float _deltaTime) {
 	auto location = glm::vec3(-.5, .6, 1.33) + pos;
 	auto rotation = glm::quat(glm::vec3(0, glm::radians(-133.0) + rot * .5, 0));
 	camera.setView(glm::translate(-location) * glm::toMat4(rotation));
-
-
 
 	if (!input::InputManager::isKeyPressed(input::Key::SPACE)) {
 		meshRenderer.draw(scene, *white, glm::identity<glm::mat4>());
