@@ -1,7 +1,7 @@
 #include "HorizontalSpring.hpp"
 #include "engine/game/actions/Actions.hpp"
 #include "engine/game/registry/Components.hpp"
-#include <GLFW\glfw3.h>
+#include <GLFW/glfw3.h>
 #include <chrono>
 #include <cmath>
 #include <glm/gtx/transform.hpp>

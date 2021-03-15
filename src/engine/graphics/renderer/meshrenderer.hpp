@@ -1,11 +1,10 @@
 #pragma once
-
 #include "../camera.hpp"
 #include "../core/shader.hpp"
 #include "engine/graphics/core/texture.hpp"
-#include "glm/glm.hpp"
 #include "mesh.hpp"
 #include <vector>
+#include <glm/glm.hpp>
 
 namespace graphics {
 	class MeshRenderer {

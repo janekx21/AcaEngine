@@ -1,7 +1,7 @@
 #include "Start.hpp"
 #include "engine/graphics/core/opengl.hpp"
+#include "engine/game/actions/Actions.hpp"
 #include <chrono>
-#include <engine/game/actions/Actions.hpp>
 
 
 void game::Start::update(float _time, float _deltaTime) {

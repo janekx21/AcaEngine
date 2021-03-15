@@ -3,7 +3,7 @@
 #include "engine/input/inputmanager.hpp"
 #include "engine/utils/containers/octree.hpp"
 #include "engine/utils/meshloader.hpp"
-#include <engine/graphics/renderer/meshrenderer.hpp>
+#include "engine/graphics/renderer/meshrenderer.hpp"
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 #include <set>

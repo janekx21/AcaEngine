@@ -23,7 +23,6 @@ namespace graphics {
 		if (meshQueue.empty()) return;
 		program.use();
 		int textureBindLocation = 0;
-		// TODO
 		// program.setUniform(cameraPositionLocation, _camera.)
 
 		for (auto &instance : meshQueue) {
