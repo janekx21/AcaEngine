@@ -11,15 +11,10 @@
 #include <engine/game/states/MovingPlanets.hpp>
 #include <engine/game/states/Start.hpp>
 #include <engine/game/states/Shooter.hpp>
-#include <engine/game/states/ExampleScene.hpp>
 
 int main()
 {
 	game::Game game;
-	//game::HorizontalSpring state;
-	game.run(std::make_unique<game::ExampleScene>());
-
-	//game.run(std::make_unique<game::HorizontalSpring>(state));
-
+	game.run(std::make_unique<game::Shooter>());
 	return EXIT_SUCCESS;
 }
