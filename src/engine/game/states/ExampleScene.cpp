@@ -91,6 +91,7 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 void game::ExampleScene::update(float _time, float _deltaTime) {
 	if (input::InputManager::isKeyPressed(input::Key::ESCAPE)) {
 		shouldFinish = true;
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
 }
 
