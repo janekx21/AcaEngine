@@ -4,13 +4,16 @@
 
 layout(location = 0) in vec2 in_texCoord;
 
-layout(binding = 0) uniform sampler2D color_texture;
-layout(binding = 1) uniform sampler2D depth_texture;
-layout(binding = 2) uniform sampler2D normal_texture;
-layout(binding = 3) uniform sampler2D position_texture;
+
+layout(binding = 0) uniform sampler2D position_texture;
+layout(binding = 1) uniform sampler2D normal_texture;
+layout(binding = 2) uniform sampler2D albedo_texture;
 layout(binding = 4) uniform sampler2D noise_texture;
+
 uniform vec3 samples[KERNEL_SIZE];
+uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
+uniform vec3 light_direction_vector;
 
 layout(location = 0) out vec4 out_color;
 
@@ -18,10 +21,25 @@ layout(location = 0) out vec4 out_color;
 const vec2 screenSize = vec2(1366.0, 768.0);
 const vec2 noiseScale = screenSize / 8;
 
-void main()
-{
-	vec3 albedo = texture(color_texture, in_texCoord).rgb;
+float phong() {
+	// without projection
 	vec3 normal = texture(normal_texture, in_texCoord).xyz;
+
+	vec3 lightDirection = normalize(light_direction_vector);
+
+	float diffuse = max(dot(normal, -lightDirection), 0);
+	float ambient = .2;
+
+	float light = diffuse + ambient;
+
+	return light;
+}
+
+float ambientOcclusion() {
+	vec3 normal = texture(normal_texture, in_texCoord).xyz;
+
+	normal = (vec4(normal, 1) * view_matrix).xyz;
+
 	vec3 position = texture(position_texture, in_texCoord).xyz;
 	vec3 randomVector = texture(noise_texture, in_texCoord * noiseScale).xyz;
 
@@ -36,14 +54,14 @@ void main()
 	// this is the fix
 	// transform from viewspace -> screenspace
 	vec4 offset = vec4(position, 1.0);
-	offset = projection_matrix * offset;    // from view to clip-space
-	offset.xyz /= offset.w;               // perspective divide
-	offset.xyz = offset.xyz * 0.5 + 0.5; // transform to range 0.0 - 1.0
+	offset = projection_matrix * offset;// from view to clip-space
+	offset.xyz /= offset.w;// perspective divide
+	offset.xyz = offset.xyz * 0.5 + 0.5;// transform to range 0.0 - 1.0
 	vec2 diff = in_texCoord - offset.xy;
 
 
 	float occlusion = 0.0;
-	for(int i = 0; i < KERNEL_SIZE; i++)
+	for (int i = 0; i < KERNEL_SIZE; i++)
 	{
 		// get sample position
 		vec3 s = samples[i];
@@ -52,9 +70,9 @@ void main()
 		samplePosition = position + samplePosition * radius;
 
 		vec4 offset = vec4(samplePosition, 1.0);
-		offset = projection_matrix * offset;    // from view to clip-space
-		offset.xyz /= offset.w;               // perspective divide
-		offset.xyz = offset.xyz * 0.5 + 0.5; // transform to range 0.0 - 1.0
+		offset = projection_matrix * offset;// from view to clip-space
+		offset.xyz /= offset.w;// perspective divide
+		offset.xyz = offset.xyz * 0.5 + 0.5;// transform to range 0.0 - 1.0
 
 		offset.xy += diff;
 
@@ -66,5 +84,19 @@ void main()
 	}
 
 	float ao = 1.0 - (occlusion / KERNEL_SIZE);
-	out_color = vec4(albedo * mix(1, ao, .9), 1);
+	return ao;
+}
+
+void main()
+{
+	vec3 albedo = texture(albedo_texture, in_texCoord).rgb;
+	vec3 normal = texture(normal_texture, in_texCoord).xyz;
+	if (normal == vec3(0, 0, 0)) {
+		// is background
+		out_color = vec4(albedo, 1);
+	} else {
+		float ao = ambientOcclusion();
+		float light = phong();
+		out_color = vec4(light * albedo * mix(1, ao, .9), 1);
+	}
 }

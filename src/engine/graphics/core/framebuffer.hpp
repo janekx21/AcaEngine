@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/vec4.hpp>
 namespace graphics {
 
 	class Texture;
@@ -32,7 +33,7 @@ namespace graphics {
 		void show(unsigned _attachment);
 
 		/// @brief Clear this buffers attachments if currently bound.
-		void clear();
+		void clear(glm::vec4 color = glm::vec4(0.f, 0.f, 0.f, 0.f));
 
 	private:
 		unsigned m_fboID;

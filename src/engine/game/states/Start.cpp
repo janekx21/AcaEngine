@@ -6,8 +6,8 @@
 
 void game::Start::update(float _time, float _deltaTime) {
 	nextState = 0;
-	float c_value = abs((int(_time * 20) % 200 - 100) / 100.f);
-	glClearColor(1 - c_value, 0.5, c_value, 1);
+	float colorValue = abs((int(_time * 20) % 200 - 100) / 100.f);
+	camera.backgroundColor = glm::vec4(1 - colorValue, 0.5, colorValue, 1);
 
 	if (input::InputManager::isKeyPressed(input::Key::ESCAPE)) {
 		isFinished = true;
@@ -31,7 +31,7 @@ void game::Start::update(float _time, float _deltaTime) {
 void game::Start::draw(float _time, float _deltaTime) {
 	meshRenderer.clear();
 	game::Actions::Draw(meshRenderer, registry);
-	meshRenderer.present(camera);
+	meshRenderer.present(camera, glm::vec3(0, 1, 0));
 }
 
 game::Start::Start() : game::GameState(),

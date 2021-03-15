@@ -8,7 +8,7 @@ namespace graphics {
 
 	Camera::Camera(float _fov, float _zNear, float zFar)
 			: m_projection(glm::perspective(glm::radians(_fov), Device::getAspectRatio(), _zNear, zFar)),
-				m_view(glm::identity<glm::mat4>()) {
+				m_view(glm::identity<glm::mat4>()), backgroundColor(0.8f, 0.8f, 0.81f, 1) {
 		updateMatrices();
 	}
 
@@ -16,7 +16,8 @@ namespace graphics {
 			: m_projection(glm::ortho(-_size.x * _origin.x, _size.x * (1.f - _origin.x),
 																-_size.y * _origin.y, _size.y * (1.f - _origin.y),
 																_zNear, _zFar)),
-				m_view(glm::identity<glm::mat4>()) {
+				m_view(glm::identity<glm::mat4>()),
+				backgroundColor(0.8f, 0.8f, 0.81f, 1) {
 		updateMatrices();
 	}
 

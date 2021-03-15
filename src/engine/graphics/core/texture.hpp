@@ -3,6 +3,7 @@
 #include "../../utils/resourcemanager.hpp"
 #include "sampler.hpp"
 #include <cstdint>
+#include <glm/vec3.hpp>
 
 namespace graphics {
 

@@ -98,8 +98,8 @@ namespace game {
 				bool move_back = true;
 				bool archetype_empty = false;
 
-				for (int i = 0; i < oldArchetype.types.size(); i++) {// iterate over component types in old archetype
-					for (int j = 0; j < archetype.types.size(); j++) { // iterate over component types in new archetype
+				for (size_t i = 0; i < oldArchetype.types.size(); i++) {// iterate over component types in old archetype
+					for (size_t j = 0; j < archetype.types.size(); j++) { // iterate over component types in new archetype
 						if (entityTypes[i] == archetype.types[j]) {      // if types match move data
 							size_t temp_typeSize = archetype.components[j].typeSize;
 							resizeComponent(archetype.components[j], archetype.entities.size() + 1);
@@ -120,7 +120,7 @@ namespace game {
 
 				oldArchetype.entities.pop_back();
 
-				for (int j = 0; j < archetype.types.size(); j++) {// store new data in new archetype
+				for (size_t j = 0; j < archetype.types.size(); j++) {// store new data in new archetype
 					if (typeid(Component).hash_code() == archetype.types[j]) {
 						size_t temp_typeSize = archetype.components[j].typeSize;
 						typesCount = j;
@@ -149,7 +149,7 @@ namespace game {
 			bool move_back = true;
 			bool archetype_empty = false;
 
-			for (int i = 0; i < entityTypes.size() - 1; i++) {// iterate over all old component types and move old data on new archetype
+			for (size_t i = 0; i < entityTypes.size() - 1; i++) {// iterate over all old component types and move old data on new archetype
 				size_t temp_typeSize = archetypes[_ent.archetype].components[i].typeSize;
 				std::vector<char> new_data;
 				ComponentType new_type = {new_data, temp_typeSize};
@@ -373,7 +373,7 @@ namespace game {
 				action_types.erase(action_types.begin());          // if yes, then erase first type
 				action_types_size.erase(action_types_size.begin());// and type size
 			}
-			for (int u = 0; u < archetypes.size(); u++) {// iterate over all archetypes
+			for (size_t u = 0; u < archetypes.size(); u++) {// iterate over all archetypes
 				auto &archetype_iterator = archetypes[u];
 				hasAllComponents = true;
 				std::vector<uint32_t> component_flags;

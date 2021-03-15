@@ -22,6 +22,7 @@ namespace graphics {
 		}
 
 		glm::vec3 toWorldSpace(const glm::vec2 &_sceenSpace) const;
+		glm::vec4 backgroundColor;
 
 	private:
 		void updateMatrices();

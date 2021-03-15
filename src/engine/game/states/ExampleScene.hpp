@@ -22,22 +22,15 @@ namespace game {
 	private:
 		graphics::Camera camera;
 		graphics::MeshRenderer meshRenderer;
+		graphics::MeshRenderer meshRendererVanilla;
 		graphics::Mesh scene;
 		graphics::Mesh quad;
-		graphics::Program program;
+		graphics::Program ambientOcclusionProgram;
 		graphics::Texture2D::Handle white;
 		bool shouldFinish = false;
 		glm::vec3 pos;
 		float rot;
 
-		// partial deferred rendering
-		graphics::Sampler *linear;
-
-		graphics::FrameBuffer backBuffer;
-		graphics::Texture2D *positionTexture;
-		graphics::Texture2D *normalTexture;
-		graphics::Texture2D *colorTexture;
-		graphics::Texture2D *depthTexture;
 		graphics::Texture2D *noiseTexture;
 		std::vector<glm::vec3> sampleList;
 	};

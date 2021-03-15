@@ -17,7 +17,7 @@ void main()
 	gl_Position = mvp_matrix * vec4(in_position, 1);
 	// TODO is this legid
 	// out_normal = (model_matrix * vec4(in_normal, 0)).xyz;
-	out_normal = (view_matrix * vec4(in_normal, 0)).xyz;
+	out_normal = (model_matrix * vec4(in_normal, 0)).xyz;
 	out_texCoords = in_texCoords;
-	out_position = (view_matrix * vec4(in_position, 1)).xyz;
+	out_position = (model_matrix * view_matrix * vec4(in_position, 1)).xyz;
 }
