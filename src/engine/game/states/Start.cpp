@@ -48,21 +48,21 @@ game::Start::Start() : game::GameState(),
 
 	camera.setView(glm::translate(glm::vec3(0, 0, -5)));
 
-	Entity triangle1 = registry.create();
-	registry.addComponent<Mesh>(triangle1, &mesh);
-	registry.addComponent<Texture>(triangle1, texture_orange);
-	registry.addComponent<Transform>(triangle1, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(-4, 0, 0));
-	registry.addComponent<Visibility>(triangle1, true);
-	Entity triangle2 = registry.create();
-	registry.addComponent<Mesh>(triangle2, &mesh);
-	registry.addComponent<Texture>(triangle2, texture_white);
-	registry.addComponent<Transform>(triangle2, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(0, 0, 0));
-	registry.addComponent<Visibility>(triangle2, true);
-	Entity triangle3 = registry.create();
-	registry.addComponent<Mesh>(triangle3, &mesh);
-	registry.addComponent<Texture>(triangle3, texture_blue);
-	registry.addComponent<Transform>(triangle3, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(4, 0, 0));
-	registry.addComponent<Visibility>(triangle3, true);
+	Entity square_orange = registry.create();
+	registry.addComponent<Mesh>(square_orange, &mesh);
+	registry.addComponent<Texture>(square_orange, texture_orange);
+	registry.addComponent<Transform>(square_orange, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(-4, 0, 0));
+	registry.addComponent<Visibility>(square_orange, true);
+	Entity square_white = registry.create();
+	registry.addComponent<Mesh>(square_white, &mesh);
+	registry.addComponent<Texture>(square_white, texture_white);
+	registry.addComponent<Transform>(square_white, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(0, 0, 0));
+	registry.addComponent<Visibility>(square_white, true);
+	Entity square_blue = registry.create();
+	registry.addComponent<Mesh>(square_blue, &mesh);
+	registry.addComponent<Texture>(square_blue, texture_blue);
+	registry.addComponent<Transform>(square_blue, glm::identity<glm::quat>(), glm::vec3(1, 1, 1), glm::vec3(4, 0, 0));
+	registry.addComponent<Visibility>(square_blue, true);
 }
 
 bool game::Start::getIsFinished() {
@@ -76,3 +76,4 @@ bool game::Start::getIsMenu() {
 int game::Start::goToState() {
 	return nextState;
 }
+

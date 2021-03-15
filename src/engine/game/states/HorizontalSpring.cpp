@@ -10,14 +10,13 @@
 void game::HorizontalSpring::update(float _time, float _deltaTime) {
 	float colorValue = abs((static_cast<int>(std::floor(_time)) % 200 - 100) / 100.f);
 	glClearColor(colorValue, 0.5, 1 - colorValue, 1);
+
 	if (input::InputManager::isKeyPressed(input::Key::ESCAPE)) {
 		isFinished = true;
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
-	registry.execute<Velocity, Transform>([&](Velocity &_velocity, Transform &_transform) {
-		_velocity.velocity.x = _velocity.velocity.x - (_transform.position.x * _deltaTime);
-		_transform.position += _velocity.velocity * _deltaTime;
-	});
+
+	game::Actions::springPhysics(registry, _deltaTime);
 }
 
 void game::HorizontalSpring::draw(float _time, float _deltaTime) {

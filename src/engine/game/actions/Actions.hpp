@@ -184,6 +184,13 @@ namespace game {
 			});
 		}
 
+		static void springPhysics(Registry& _registry, float _deltaTime) {
+			_registry.execute<Velocity, Transform>([&](Velocity& _velocity, Transform& _transform) {
+				_velocity.velocity.x = _velocity.velocity.x - (_transform.position.x * _deltaTime);
+				_transform.position += _velocity.velocity * _deltaTime;
+				});
+		}
+
 		static void cameraMovement(glm::vec3 &_pos, float &_rot, float _deltaTime, graphics::Camera &_camera, glm::vec3 _cameraStartPosition) {
 			if (input::InputManager::isKeyPressed(input::Key::A)) {
 				_pos.x -= _deltaTime * 5;
