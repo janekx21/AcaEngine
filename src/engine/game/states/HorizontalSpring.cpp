@@ -9,7 +9,8 @@
 
 void game::HorizontalSpring::update(float _time, float _deltaTime) {
 	float colorValue = abs((static_cast<int>(std::floor(_time)) % 200 - 100) / 100.f);
-	glClearColor(colorValue, 0.5, 1 - colorValue, 1);
+	camera.backgroundColor = glm::vec4(colorValue, 0.5, 1 - colorValue, 1);
+
 	if (input::InputManager::isKeyPressed(input::Key::ESCAPE)) {
 		isFinished = true;
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));

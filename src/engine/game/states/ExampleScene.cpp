@@ -15,13 +15,12 @@ game::ExampleScene::ExampleScene() : camera(44, .1, 10),
 																		 scene(graphics::Mesh("models/scene.obj")),
 																		 quad(graphics::Mesh("models/quad.obj")),
 																		 backBuffer() {
-	auto sampler = graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
-																	 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
 
 	linear = new graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
 																 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP);
 
-	white = graphics::Texture2D::load("../resources/textures/white.png", sampler, false);
+	white = graphics::Texture2D::load("../resources/textures/white.png", graphics::Sampler(graphics::Sampler::Filter::LINEAR, graphics::Sampler::Filter::LINEAR,
+																																												 graphics::Sampler::Filter::LINEAR, graphics::Sampler::Border::CLAMP), false);
 
 	auto location = glm::vec3(-.5, .6, 1.33);
 	auto rotation = glm::quat(glm::vec3(0, glm::radians(-133.0), 0));

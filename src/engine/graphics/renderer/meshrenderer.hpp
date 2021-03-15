@@ -5,6 +5,7 @@
 #include "engine/graphics/core/texture.hpp"
 #include "glm/glm.hpp"
 #include "mesh.hpp"
+#include <engine/graphics/core/framebuffer.hpp>
 #include <vector>
 
 namespace graphics {
@@ -23,11 +24,25 @@ namespace graphics {
 			const glm::mat4 transform;
 		};
 
-		Program program;
+		Program geometryProgram;
 		std::vector<MeshInstance> meshQueue;
-		int cameraPositionLocation;
-		int modelMatrixLocation;
-		int mvpMatrixLocation;
-		int albedoTextureLocation;
+		int viewMatrixLocation{};
+		int mvpMatrixLocation{};
+		int albedoTextureLocation{};
+
+		// Deferred rendering
+		FrameBuffer geometryBuffer;
+		Texture2D *depthTexture;
+		Texture2D *albedoTexture{};
+		Texture2D *normalTexture{};
+		Texture2D *positionTexture{};
+		Program lightingProgram;
+		Mesh quad;
+
+		void createGeometryProgram();
+		void findUniformLocations();
+		void renderAllModels(const Camera &_camera);
+		void createLightingProgram();
+		void createGeometryBuffer(const glm::ivec2 &size);
 	};
 }// namespace graphics

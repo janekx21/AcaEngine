@@ -91,9 +91,9 @@ namespace graphics {
 		glCall(glDrawArrays, GL_TRIANGLE_STRIP, 0, 3);
 	}
 
-	void FrameBuffer::clear() {
+	void FrameBuffer::clear(glm::vec4 color) {
 		Device::setZWrite(true);
-		glClearColor(0.f, 0.f, 0.f, 0.f);
+		glClearColor(color.r, color.g, color.b, color.a);
 		if (m_depthTexture)
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		else
