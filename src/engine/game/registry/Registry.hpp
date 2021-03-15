@@ -2,12 +2,10 @@
 #include "Archetype.hpp"
 #include "Entity.hpp"
 #include "EntityRef.hpp"
-#include <any>
-#include <iostream>
 #include <optional>
 #include <tuple>
-#include <unordered_map>
 #include <vector>
+#include <iostream>
 
 namespace game {
 	template<typename T>
@@ -465,7 +463,7 @@ namespace game {
 
 		uint32_t getPositionInArchetype(Entity &entity) const {// get entity index in archetype data array
 			auto &archetype = archetypes[entity.archetype];
-			for (size_t i = 0; i < archetype.entities.size(); i++) {
+			for (uint32_t i = 0; i < archetype.entities.size(); i++) {
 				if (archetype.entities[i] == entity.id) {
 					return i;
 				}

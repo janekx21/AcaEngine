@@ -3,7 +3,7 @@
 #include "engine/input/inputmanager.hpp"
 #include "engine/utils/containers/octree.hpp"
 #include "engine/utils/meshloader.hpp"
-#include <engine/graphics/renderer/meshrenderer.hpp>
+#include "engine/graphics/renderer/meshrenderer.hpp"
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 #include <set>
@@ -182,6 +182,13 @@ namespace game {
 					_registry.erase(_ent);
 				}
 			});
+		}
+
+		static void springPhysics(Registry& _registry, float _deltaTime) {
+			_registry.execute<Velocity, Transform>([&](Velocity& _velocity, Transform& _transform) {
+				_velocity.velocity.x = _velocity.velocity.x - (_transform.position.x * _deltaTime);
+				_transform.position += _velocity.velocity * _deltaTime;
+				});
 		}
 
 		static void cameraMovement(glm::vec3 &_pos, float &_rot, float _deltaTime, graphics::Camera &_camera, glm::vec3 _cameraStartPosition) {

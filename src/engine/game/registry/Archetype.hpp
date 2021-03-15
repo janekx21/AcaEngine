@@ -1,5 +1,5 @@
 #pragma once
-#include <engine\game\registry\ComponentType.hpp>
+#include "engine/game/registry/ComponentType.hpp"
 #include <vector>
 struct Archetype {
 
